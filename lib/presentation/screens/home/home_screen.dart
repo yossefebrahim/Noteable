@@ -1,57 +1,114 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:noteable_app/domain/entities/note_entity.dart';
 import 'package:noteable_app/presentation/providers/notes_view_model.dart';
 import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = -1;
+
+  void _handleKeyEvent(KeyEvent event, NotesViewModel vm, BuildContext context) {
+    if (event is! KeyDownEvent) return;
+
+    if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      setState(() {
+        if (_selectedIndex < vm.notes.length - 1) {
+          _selectedIndex++;
+        } else {
+          _selectedIndex = 0; // Wrap to top
+        }
+      });
+    } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      setState(() {
+        if (_selectedIndex > 0) {
+          _selectedIndex--;
+        } else if (vm.notes.isNotEmpty) {
+          _selectedIndex = vm.notes.length - 1; // Wrap to bottom
+        }
+      });
+    } else if (event.logicalKey == LogicalKeyboardKey.enter && _selectedIndex >= 0) {
+      final note = vm.notes[_selectedIndex];
+      context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<NotesViewModel>(
       builder: (BuildContext context, NotesViewModel vm, _) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Notes'),
-            actions: <Widget>[
-              IconButton(onPressed: () => context.push('/search'), icon: const Icon(Icons.search_rounded)),
-              IconButton(onPressed: () => context.push('/folders'), icon: const Icon(Icons.folder_outlined)),
-              IconButton(onPressed: () => context.push('/settings'), icon: const Icon(Icons.settings_outlined)),
-            ],
+        return CallbackShortcuts(
+          bindings: <ShortcutActivator, VoidCallback>{
+            const SingleActivator(LogicalKeyboardKey.keyN, control: true, meta: true):
+                () => context.push('/note-detail').then((_) => vm.refreshNotes()),
+            const SingleActivator(LogicalKeyboardKey.keyF, control: true, meta: true):
+                () => context.push('/search'),
+          },
+          child: Focus(
+            autofocus: true,
+            onKeyEvent: (KeyEvent event) => _handleKeyEvent(event, vm, context),
+            child: Scaffold(
+              appBar: AppBar(
+                title: const Text('Notes'),
+                actions: <Widget>[
+                  IconButton(onPressed: () => context.push('/search'), icon: const Icon(Icons.search_rounded)),
+                  IconButton(onPressed: () => context.push('/folders'), icon: const Icon(Icons.folder_outlined)),
+                  IconButton(onPressed: () => context.push('/settings'), icon: const Icon(Icons.settings_outlined)),
+                ],
+              ),
+              floatingActionButton: FloatingActionButton.extended(
+                onPressed: () => context.push('/note-detail').then((_) => vm.refreshNotes()),
+                icon: const Icon(Icons.add),
+                label: const Text('New note'),
+              ),
+              body: vm.notes.isEmpty
+                  ? const Center(child: Text('No notes yet. Tap "New note"'))
+                  : ListView.separated(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: vm.notes.length,
+                      separatorBuilder: (_, index) => const SizedBox(height: 12),
+                      itemBuilder: (BuildContext context, int index) {
+                        final NoteEntity note = vm.notes[index];
+                        final bool isSelected = _selectedIndex == index;
+                        return Card(
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.primaryContainer
+                              : null,
+                          elevation: isSelected ? 4 : 1,
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            title: Text(note.title.isEmpty ? 'Untitled' : note.title),
+                            subtitle: Text(
+                              note.content.isEmpty ? 'Start writing…' : note.content,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            leading: IconButton(
+                              tooltip: note.isPinned ? 'Unpin' : 'Pin',
+                              onPressed: () => vm.togglePin(note.id),
+                              icon: Text(note.isPinned ? '📌' : '📍', style: const TextStyle(fontSize: 18)),
+                            ),
+                            onTap: () {
+                              setState(() => _selectedIndex = index);
+                              context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes());
+                            },
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              onPressed: () => _confirmDelete(context, vm, note),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
           ),
-          floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => context.push('/note-detail').then((_) => vm.refreshNotes()),
-            icon: const Icon(Icons.add),
-            label: const Text('New note'),
-          ),
-          body: vm.notes.isEmpty
-              ? const Center(child: Text('No notes yet. Tap "New note"'))
-              : ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: vm.notes.length,
-                  separatorBuilder: (_, index) => const SizedBox(height: 12),
-                  itemBuilder: (BuildContext context, int index) {
-                    final NoteEntity note = vm.notes[index];
-                    return Card(
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        title: Text(note.title.isEmpty ? 'Untitled' : note.title),
-                        subtitle: Text(note.content.isEmpty ? 'Start writing…' : note.content, maxLines: 2, overflow: TextOverflow.ellipsis),
-                        leading: IconButton(
-                          tooltip: note.isPinned ? 'Unpin' : 'Pin',
-                          onPressed: () => vm.togglePin(note.id),
-                          icon: Text(note.isPinned ? '📌' : '📍', style: const TextStyle(fontSize: 18)),
-                        ),
-                        onTap: () => context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes()),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: () => _confirmDelete(context, vm, note),
-                        ),
-                      ),
-                    );
-                  },
-                ),
         );
       },
     );
