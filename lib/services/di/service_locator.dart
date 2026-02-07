@@ -4,6 +4,7 @@ import 'package:noteable_app/data/repositories/in_memory_notes_feature_repositor
 import 'package:noteable_app/domain/repositories/notes_feature_repository.dart';
 import 'package:noteable_app/domain/usecases/feature_usecases.dart';
 import 'package:noteable_app/presentation/providers/app_provider.dart';
+import 'package:noteable_app/presentation/providers/keyboard_shortcuts_provider.dart';
 import 'package:noteable_app/presentation/providers/note_detail_view_model.dart';
 import 'package:noteable_app/presentation/providers/notes_view_model.dart';
 
@@ -12,6 +13,9 @@ final GetIt sl = GetIt.instance;
 Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<AppProvider>(AppProvider.new);
   sl.registerLazySingleton<KeyboardShortcutService>(KeyboardShortcutService.new);
+  sl.registerLazySingleton<KeyboardShortcutsProvider>(
+    () => KeyboardShortcutsProvider(sl()),
+  );
   sl.registerLazySingleton<NotesFeatureRepository>(InMemoryNotesFeatureRepository.new);
 
   sl.registerLazySingleton<GetNotesUseCase>(() => GetNotesUseCase(sl()));
