@@ -3,7 +3,7 @@
   "spec": "003-voice-notes-audio-recording",
   "state": "building",
   "subtasks": {
-    "completed": 7,
+    "completed": 10,
     "total": 45,
     "in_progress": 1,
     "failed": 0
@@ -18,8 +18,8 @@
     "max": 1
   },
   "session": {
-    "number": 10,
+    "number": 13,
     "started_at": "2026-02-08T00:31:10.237502"
   },
-  "last_update": "2026-02-08T00:55:44.044393"
+  "last_update": "2026-02-08T01:03:59.049646"
 }
