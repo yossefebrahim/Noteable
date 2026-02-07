@@ -15,4 +15,12 @@ abstract interface class NoteRepository implements BaseRepository {
   Future<Note> togglePinNote(String id);
 
   Future<List<Note>> searchNotes(String query);
+
+  Future<String> exportNote(String id, String format);
+
+  Future<String> exportFolder(String? folderId);
+
+  Future<String> exportAllNotes();
+
+  Future<String> getShareableNoteContent(String id);
 }
