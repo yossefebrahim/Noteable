@@ -99,8 +99,13 @@ class ExportService {
   }
 
   /// Convert note to plain text format
+  ///
+  /// Creates a simple plain text document with:
+  /// - Title as plain text (no markdown formatting)
+  /// - Blank line after title for separation
+  /// - Content with preserved line breaks
+  /// - Handles empty title or content gracefully
   String _convertToTxt(NoteModel note) {
-    // TXT export will be fully implemented in subtask-2-3
     final buffer = StringBuffer();
 
     if (note.title.isNotEmpty) {
