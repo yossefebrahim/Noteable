@@ -10,6 +10,11 @@ import 'services/di/service_locator.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupServiceLocator();
+
+  // Initialize widget channel for widget communication
+  final widgetChannel = sl<WidgetChannel>();
+  await widgetChannel.init();
+
   runApp(const NoteableApp());
 }
 

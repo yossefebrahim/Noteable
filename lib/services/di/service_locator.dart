@@ -5,10 +5,12 @@ import 'package:noteable_app/domain/usecases/feature_usecases.dart';
 import 'package:noteable_app/presentation/providers/app_provider.dart';
 import 'package:noteable_app/presentation/providers/note_detail_view_model.dart';
 import 'package:noteable_app/presentation/providers/notes_view_model.dart';
+import 'package:noteable_app/services/platform/channels/widget_channel.dart';
 
 final GetIt sl = GetIt.instance;
 
 Future<void> setupServiceLocator() async {
+  sl.registerLazySingleton<WidgetChannel>(WidgetChannel.new);
   sl.registerLazySingleton<AppProvider>(AppProvider.new);
   sl.registerLazySingleton<NotesFeatureRepository>(InMemoryNotesFeatureRepository.new);
 
