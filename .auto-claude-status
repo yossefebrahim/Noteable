@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "008-performance-regression-testing-in-ci-cd",
+  "state": "building",
+  "subtasks": {
+    "completed": 3,
+    "total": 11,
+    "in_progress": 1,
+    "failed": 0
+  },
+  "phase": {
+    "current": "App Launch Time Benchmark",
+    "id": null,
+    "total": 1
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 5,
+    "started_at": "2026-02-08T01:22:17.647010"
+  },
+  "last_update": "2026-02-08T01:40:22.869220"
+}

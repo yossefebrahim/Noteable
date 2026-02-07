@@ -1,0 +1,39 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read(./**)",
+      "Write(./**)",
+      "Edit(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Read(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/008-performance-regression-testing-in-ci-cd/**)",
+      "Write(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/008-performance-regression-testing-in-ci-cd/**)",
+      "Edit(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/008-performance-regression-testing-in-ci-cd/**)",
+      "Glob(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/008-performance-regression-testing-in-ci-cd/**)",
+      "Grep(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/008-performance-regression-testing-in-ci-cd/**)",
+      "Read(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/008-performance-regression-testing-in-ci-cd/.auto-claude/specs/008-performance-regression-testing-in-ci-cd/**)",
+      "Write(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/008-performance-regression-testing-in-ci-cd/.auto-claude/specs/008-performance-regression-testing-in-ci-cd/**)",
+      "Edit(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/008-performance-regression-testing-in-ci-cd/.auto-claude/specs/008-performance-regression-testing-in-ci-cd/**)",
+      "Read(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/**)",
+      "Write(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/**)",
+      "Edit(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/**)",
+      "Glob(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/**)",
+      "Grep(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/**)",
+      "Bash(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__context7__resolve-library-id(*)",
+      "mcp__context7__get-library-docs(*)",
+      "mcp__graphiti-memory__search_nodes(*)",
+      "mcp__graphiti-memory__search_facts(*)",
+      "mcp__graphiti-memory__add_episode(*)",
+      "mcp__graphiti-memory__get_episodes(*)",
+      "mcp__graphiti-memory__get_entity_edge(*)"
+    ]
+  }
+}

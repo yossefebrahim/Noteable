@@ -45,3 +45,7 @@ Future<void> setupServiceLocator() async {
     ),
   );
 }
+
+Future<void> resetServiceLocator() async {
+  await sl.reset();
+}
