@@ -3,7 +3,7 @@
   "spec": "004-note-templates",
   "state": "building",
   "subtasks": {
-    "completed": 10,
+    "completed": 12,
     "total": 19,
     "in_progress": 1,
     "failed": 0
@@ -18,8 +18,8 @@
     "max": 1
   },
   "session": {
-    "number": 11,
+    "number": 13,
     "started_at": "2026-02-08T00:31:28.972157"
   },
-  "last_update": "2026-02-08T01:06:11.884289"
+  "last_update": "2026-02-08T01:13:08.184112"
 }

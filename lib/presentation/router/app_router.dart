@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:noteable_app/presentation/providers/folder_provider.dart';
+import 'package:noteable_app/presentation/providers/template_view_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/di/service_locator.dart';
@@ -9,6 +11,8 @@ import '../screens/home/home_screen.dart';
 import '../screens/note_detail/note_detail_screen.dart';
 import '../screens/search/search_screen.dart';
 import '../screens/settings/settings_screen.dart';
+import '../screens/templates/template_editor_screen.dart';
+import '../screens/templates/templates_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -45,6 +49,30 @@ class AppRouter {
         path: '/settings',
         pageBuilder: (BuildContext context, GoRouterState state) =>
             _animatedPage(state: state, child: const SettingsScreen()),
+      ),
+      GoRoute(
+        path: '/templates',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            _animatedPage(
+              state: state,
+              child: ChangeNotifierProvider<TemplateViewModel>(
+                create: (_) => sl<TemplateViewModel>()..load(),
+                child: const TemplatesScreen(),
+              ),
+            ),
+      ),
+      GoRoute(
+        path: '/template-editor',
+        pageBuilder: (BuildContext context, GoRouterState state) => _animatedPage(
+          state: state,
+          child: ChangeNotifierProvider<TemplateViewModel>(
+            create: (_) => sl<TemplateViewModel>()..load(),
+            child: ChangeNotifierProvider<FolderViewModel>(
+              create: (_) => const FolderViewModel(),
+              child: TemplateEditorScreen(templateId: state.extra as String?),
+            ),
+          ),
+        ),
       ),
     ],
   );

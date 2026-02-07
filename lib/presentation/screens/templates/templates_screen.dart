@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:noteable_app/domain/entities/template_entity.dart';
 import 'package:noteable_app/presentation/providers/template_view_model.dart';
 import 'package:provider/provider.dart';
@@ -56,17 +57,7 @@ class TemplatesScreen extends StatelessWidget {
     BuildContext context, {
     TemplateEntity? template,
   }) async {
-    // TODO: Navigate to template editor after subtask-3-3 is complete
-    // context.go('/template-editor', extra: template);
-    if (context.mounted) {
-      final ScaffoldMessengerState scaffold = ScaffoldMessenger.of(context);
-      scaffold.showSnackBar(
-        const SnackBar(
-          content: Text('Template editor coming in next subtask'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
+    context.go('/template-editor', extra: template?.id);
   }
 
   Future<void> _confirmDelete(
