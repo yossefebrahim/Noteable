@@ -85,97 +85,109 @@ class TemplateRepositoryImpl implements TemplateRepository {
         isBuiltIn: true,
       ),
       TemplateEntity(
-        id: 'builtin_project',
-        name: 'Project Plan',
-        title: 'Project: {{project_name}}',
-        content: '''# Project: {{project_name}}
+        id: 'builtin_weekly',
+        name: 'Weekly Plan',
+        title: 'Weekly Plan - Week of {{date}}',
+        content: '''# Weekly Plan - Week of {{date}}
 
-**Start Date:** {{start_date}}
-**Target Date:** {{target_date}}
-**Status:** {{status}}
+## Goals for This Week
+{{goals}}
 
-## Overview
-{{overview}}
+## Priority Tasks
+1. {{task1}}
+2. {{task2}}
+3. {{task3}}
+4. {{task4}}
+5. {{task5}}
 
-## Objectives
-{{objectives}}
+## Schedule
+### Monday
+{{monday}}
 
-## Milestones
-1. {{milestone1}} - {{milestone1_date}}
-2. {{milestone2}} - {{milestone2_date}}
-3. {{milestone3}} - {{milestone3_date}}
+### Tuesday
+{{tuesday}}
 
-## Resources
-{{resources}}
+### Wednesday
+{{wednesday}}
 
-## Risks & Mitigation
-{{risks}}''',
+### Thursday
+{{thursday}}
+
+### Friday
+{{friday}}
+
+## Notes & Reflections
+{{notes}}
+
+## Next Week Preview
+{{next_week}}''',
         variables: <TemplateVariable>[
-          TemplateVariable(name: 'project_name', type: 'text'),
-          TemplateVariable(name: 'start_date', type: 'date', defaultValue: 'today'),
-          TemplateVariable(name: 'target_date', type: 'date'),
-          TemplateVariable(name: 'status', type: 'text', defaultValue: 'Planning'),
-          TemplateVariable(name: 'overview', type: 'text_multiline'),
-          TemplateVariable(name: 'objectives', type: 'text_multiline'),
-          TemplateVariable(name: 'milestone1', type: 'text'),
-          TemplateVariable(name: 'milestone1_date', type: 'date'),
-          TemplateVariable(name: 'milestone2', type: 'text'),
-          TemplateVariable(name: 'milestone2_date', type: 'date'),
-          TemplateVariable(name: 'milestone3', type: 'text'),
-          TemplateVariable(name: 'milestone3_date', type: 'date'),
-          TemplateVariable(name: 'resources', type: 'text_multiline'),
-          TemplateVariable(name: 'risks', type: 'text_multiline'),
+          TemplateVariable(name: 'date', type: 'date', defaultValue: 'today'),
+          TemplateVariable(name: 'goals', type: 'text_multiline'),
+          TemplateVariable(name: 'task1', type: 'text'),
+          TemplateVariable(name: 'task2', type: 'text'),
+          TemplateVariable(name: 'task3', type: 'text'),
+          TemplateVariable(name: 'task4', type: 'text'),
+          TemplateVariable(name: 'task5', type: 'text'),
+          TemplateVariable(name: 'monday', type: 'text_multiline'),
+          TemplateVariable(name: 'tuesday', type: 'text_multiline'),
+          TemplateVariable(name: 'wednesday', type: 'text_multiline'),
+          TemplateVariable(name: 'thursday', type: 'text_multiline'),
+          TemplateVariable(name: 'friday', type: 'text_multiline'),
+          TemplateVariable(name: 'notes', type: 'text_multiline'),
+          TemplateVariable(name: 'next_week', type: 'text_multiline'),
         ],
         isBuiltIn: true,
       ),
       TemplateEntity(
-        id: 'builtin_bug_report',
-        name: 'Bug Report',
-        title: 'Bug: {{title}}',
-        content: '''# Bug Report: {{title}}
+        id: 'builtin_book',
+        name: 'Book Notes',
+        title: 'Book Notes: {{title}} by {{author}}',
+        content: '''# Book Notes: {{title}} by {{author}}
 
-**Severity:** {{severity}}
-**Priority:** {{priority}}
-**Status:** {{status}}
+**Start Date:** {{start_date}}
+**Finish Date:** {{finish_date}}
+**Rating:** {{rating}}/5
 
-## Description
-{{description}}
+## Book Summary
+{{summary}}
 
-## Steps to Reproduce
-1. {{step1}}
-2. {{step2}}
-3. {{step3}}
+## Key Takeaways
+1. {{takeaway1}}
+2. {{takeaway2}}
+3. {{takeaway3}}
 
-## Expected Behavior
-{{expected_behavior}}
+## Favorite Quotes
+> "{{quote1}}"
 
-## Actual Behavior
-{{actual_behavior}}
+> "{{quote2}}"
 
-## Environment
-- **OS:** {{os}}
-- **Version:** {{version}}
+## Notes by Chapter/Section
+{{chapter_notes}}
 
-## Screenshots
-{{screenshots}}
+## Personal Reflections
+{{reflections}}
 
-## Additional Notes
-{{notes}}''',
+## Recommendations
+{{recommendations}}
+
+Would I recommend this book? {{would_recommend}}''',
         variables: <TemplateVariable>[
           TemplateVariable(name: 'title', type: 'text'),
-          TemplateVariable(name: 'severity', type: 'text', defaultValue: 'Medium'),
-          TemplateVariable(name: 'priority', type: 'text', defaultValue: 'Normal'),
-          TemplateVariable(name: 'status', type: 'text', defaultValue: 'Open'),
-          TemplateVariable(name: 'description', type: 'text_multiline'),
-          TemplateVariable(name: 'step1', type: 'text'),
-          TemplateVariable(name: 'step2', type: 'text'),
-          TemplateVariable(name: 'step3', type: 'text'),
-          TemplateVariable(name: 'expected_behavior', type: 'text_multiline'),
-          TemplateVariable(name: 'actual_behavior', type: 'text_multiline'),
-          TemplateVariable(name: 'os', type: 'text'),
-          TemplateVariable(name: 'version', type: 'text'),
-          TemplateVariable(name: 'screenshots', type: 'text_multiline'),
-          TemplateVariable(name: 'notes', type: 'text_multiline'),
+          TemplateVariable(name: 'author', type: 'text'),
+          TemplateVariable(name: 'start_date', type: 'date', defaultValue: 'today'),
+          TemplateVariable(name: 'finish_date', type: 'date'),
+          TemplateVariable(name: 'rating', type: 'text', defaultValue: '5'),
+          TemplateVariable(name: 'summary', type: 'text_multiline'),
+          TemplateVariable(name: 'takeaway1', type: 'text'),
+          TemplateVariable(name: 'takeaway2', type: 'text'),
+          TemplateVariable(name: 'takeaway3', type: 'text'),
+          TemplateVariable(name: 'quote1', type: 'text_multiline'),
+          TemplateVariable(name: 'quote2', type: 'text_multiline'),
+          TemplateVariable(name: 'chapter_notes', type: 'text_multiline'),
+          TemplateVariable(name: 'reflections', type: 'text_multiline'),
+          TemplateVariable(name: 'recommendations', type: 'text_multiline'),
+          TemplateVariable(name: 'would_recommend', type: 'text', defaultValue: 'Yes'),
         ],
         isBuiltIn: true,
       ),
