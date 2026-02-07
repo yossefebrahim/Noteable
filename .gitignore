@@ -67,3 +67,6 @@ app.*.map.json
 .env*
 *.secret
 
+
+# Auto Claude data directory
+.auto-claude/
