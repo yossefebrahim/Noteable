@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -109,32 +111,40 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Colors.red,
                             label: 'Delete',
                           ),
-                          child: Card(
-                            color: isSelected
-                                ? Theme.of(context).colorScheme.primaryContainer
+                          child: GestureDetector(
+                            onForcePressStart: Platform.isIOS
+                                ? (_) {
+                                    _showNotePreview(context, note, vm);
+                                  }
                                 : null,
-                            elevation: isSelected ? 4 : 1,
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              title: Text(note.title.isEmpty ? 'Untitled' : note.title),
-                              subtitle: Text(
-                                note.content.isEmpty ? 'Start writing…' : note.content,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              leading: IconButton(
-                                tooltip: note.isPinned ? 'Unpin' : 'Pin',
-                                onPressed: () => vm.togglePin(note.id),
-                                icon: Text(note.isPinned ? '📌' : '📍', style: const TextStyle(fontSize: 18)),
-                              ),
-                              onTap: () {
-                                setState(() => _selectedIndex = index);
-                                context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes());
-                              },
-                              onLongPress: () => _showContextMenu(context, note, vm),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.delete_outline),
-                                onPressed: () => _confirmDelete(context, vm, note),
+                            onForcePressEnd: Platform.isIOS ? (_) {} : null,
+                            child: Card(
+                              color: isSelected
+                                  ? Theme.of(context).colorScheme.primaryContainer
+                                  : null,
+                              elevation: isSelected ? 4 : 1,
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                title: Text(note.title.isEmpty ? 'Untitled' : note.title),
+                                subtitle: Text(
+                                  note.content.isEmpty ? 'Start writing…' : note.content,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                leading: IconButton(
+                                  tooltip: note.isPinned ? 'Unpin' : 'Pin',
+                                  onPressed: () => vm.togglePin(note.id),
+                                  icon: Text(note.isPinned ? '📌' : '📍', style: const TextStyle(fontSize: 18)),
+                                ),
+                                onTap: () {
+                                  setState(() => _selectedIndex = index);
+                                  context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes());
+                                },
+                                onLongPress: () => _showContextMenu(context, note, vm),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete_outline),
+                                  onPressed: () => _confirmDelete(context, vm, note),
+                                ),
                               ),
                             ),
                           ),
@@ -261,6 +271,39 @@ class _HomeScreenState extends State<HomeScreen> {
           onPressed: () {},
         ),
       ),
+    );
+  }
+
+  void _showNotePreview(BuildContext context, NoteEntity note, NotesViewModel vm) {
+    final title = note.title.isEmpty ? 'Untitled' : note.title;
+    final content = note.content.isEmpty ? 'No content' : note.content;
+
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(title),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Text(content),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Close'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes());
+              },
+              child: const Text('Open'),
+            ),
+          ],
+        );
+      },
     );
   }
 
