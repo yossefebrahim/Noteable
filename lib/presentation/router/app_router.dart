@@ -29,9 +29,12 @@ class AppRouter {
         path: '/note-detail',
         pageBuilder: (BuildContext context, GoRouterState state) => _animatedPage(
           state: state,
-          child: ChangeNotifierProvider<NoteEditorViewModel>(
-            create: (_) => sl<NoteEditorViewModel>(),
-            child: NoteDetailScreen(noteId: state.extra as String?),
+          child: ChangeNotifierProvider<TemplateViewModel>(
+            create: (_) => sl<TemplateViewModel>()..load(),
+            child: ChangeNotifierProvider<NoteEditorViewModel>(
+              create: (_) => sl<NoteEditorViewModel>(),
+              child: NoteDetailScreen(noteId: state.extra as String?),
+            ),
           ),
         ),
       ),

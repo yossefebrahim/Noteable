@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:noteable_app/domain/entities/template_entity.dart';
+import 'package:noteable_app/domain/usecases/template/apply_template_usecase.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/note_detail_view_model.dart';
 import '../../providers/notes_view_model.dart';
+import '../../providers/template_view_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
 
@@ -102,6 +105,77 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showTemplateDialog(context),
+        child: const Icon(Icons.description_outlined),
+      ),
     );
+  }
+
+  Future<void> _showTemplateDialog(BuildContext context) async {
+    final TemplateEntity? selected = await showDialog<TemplateEntity>(
+      context: context,
+      builder: (BuildContext context) {
+        return Consumer<TemplateViewModel>(
+          builder: (BuildContext context, TemplateViewModel vm, _) {
+            final List<TemplateEntity> templates = vm.templates;
+            if (templates.isEmpty) {
+              return AlertDialog(
+                title: const Text('Use Template'),
+                content: const Text('No templates available. Create templates first.'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Close'),
+                  ),
+                ],
+              );
+            }
+            return AlertDialog(
+              title: const Text('Use Template'),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: templates.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final TemplateEntity template = templates[index];
+                    return ListTile(
+                      title: Text(template.name),
+                      subtitle: Text(template.title),
+                      leading: Icon(
+                        template.isBuiltIn ? Icons.lock_outlined : Icons.description_outlined,
+                      ),
+                      onTap: () => Navigator.pop(context, template),
+                    );
+                  },
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    if (selected != null) {
+      await _applyTemplate(selected);
+    }
+  }
+
+  Future<void> _applyTemplate(TemplateEntity template) async {
+    final applyTemplate = ApplyTemplateUseCase(template: template);
+    final result = await applyTemplate();
+    if (result.isSuccess && result.data != null) {
+      final applied = result.data!;
+      _titleController.text = applied.title;
+      _contentController.text = applied.content;
+      final NoteEditorViewModel vm = context.read<NoteEditorViewModel>();
+      vm.updateDraft(title: applied.title, content: applied.content);
+    }
   }
 }
