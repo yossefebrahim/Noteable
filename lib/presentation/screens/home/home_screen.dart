@@ -77,32 +77,65 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (BuildContext context, int index) {
                         final NoteEntity note = vm.notes[index];
                         final bool isSelected = _selectedIndex == index;
-                        return Card(
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.primaryContainer
-                              : null,
-                          elevation: isSelected ? 4 : 1,
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            title: Text(note.title.isEmpty ? 'Untitled' : note.title),
-                            subtitle: Text(
-                              note.content.isEmpty ? 'Start writing…' : note.content,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            leading: IconButton(
-                              tooltip: note.isPinned ? 'Unpin' : 'Pin',
-                              onPressed: () => vm.togglePin(note.id),
-                              icon: Text(note.isPinned ? '📌' : '📍', style: const TextStyle(fontSize: 18)),
-                            ),
-                            onTap: () {
-                              setState(() => _selectedIndex = index);
-                              context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes());
-                            },
-                            onLongPress: () => _showContextMenu(context, note, vm),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              onPressed: () => _confirmDelete(context, vm, note),
+                        return Dismissible(
+                          key: Key(note.id),
+                          direction: DismissDirection.horizontal,
+                          onDismissed: (DismissDirection direction) {
+                            if (direction == DismissDirection.endToStart) {
+                              // Swipe left (end to start) - delete
+                              _confirmDelete(context, vm, note);
+                            } else if (direction == DismissDirection.startToEnd) {
+                              // Swipe right (start to end) - toggle pin
+                              vm.togglePin(note.id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(note.isPinned ? 'Note unpinned' : 'Note pinned'),
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            }
+                          },
+                          background: _buildSwipeBackground(
+                            context,
+                            alignment: MainAxisAlignment.start,
+                            icon: note.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
+                            color: Colors.amber,
+                            label: note.isPinned ? 'Unpin' : 'Pin',
+                          ),
+                          secondaryBackground: _buildSwipeBackground(
+                            context,
+                            alignment: MainAxisAlignment.end,
+                            icon: Icons.delete_outline,
+                            color: Colors.red,
+                            label: 'Delete',
+                          ),
+                          child: Card(
+                            color: isSelected
+                                ? Theme.of(context).colorScheme.primaryContainer
+                                : null,
+                            elevation: isSelected ? 4 : 1,
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              title: Text(note.title.isEmpty ? 'Untitled' : note.title),
+                              subtitle: Text(
+                                note.content.isEmpty ? 'Start writing…' : note.content,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              leading: IconButton(
+                                tooltip: note.isPinned ? 'Unpin' : 'Pin',
+                                onPressed: () => vm.togglePin(note.id),
+                                icon: Text(note.isPinned ? '📌' : '📍', style: const TextStyle(fontSize: 18)),
+                              ),
+                              onTap: () {
+                                setState(() => _selectedIndex = index);
+                                context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes());
+                              },
+                              onLongPress: () => _showContextMenu(context, note, vm),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete_outline),
+                                onPressed: () => _confirmDelete(context, vm, note),
+                              ),
                             ),
                           ),
                         );
@@ -227,6 +260,37 @@ class _HomeScreenState extends State<HomeScreen> {
           label: 'OK',
           onPressed: () {},
         ),
+      ),
+    );
+  }
+
+  Widget _buildSwipeBackground(
+    BuildContext context, {
+    required MainAxisAlignment alignment,
+    required IconData icon,
+    required Color color,
+    required String label,
+  }) {
+    return Container(
+      alignment: alignment,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: alignment,
+        children: <Widget>[
+          Icon(icon, color: Colors.white),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
