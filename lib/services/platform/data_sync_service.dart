@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../data/models/note_model.dart';
@@ -16,6 +17,7 @@ class DataSyncService {
   static const String _appGroupIdentifier = 'group.com.example.noteable';
   static const String _notesFileName = 'widget_notes.json';
   static const String _pinnedNotesFileName = 'widget_pinned_notes.json';
+  static const MethodChannel _widgetChannel = MethodChannel('com.example.noteable/widgets');
 
   Directory? _appGroupDirectory;
 
@@ -64,6 +66,9 @@ class DataSyncService {
       final jsonString = jsonEncode(notesJson);
 
       await file.writeAsString(jsonString);
+
+      // Trigger widget refresh after syncing
+      await triggerWidgetRefresh();
     } catch (e) {
       debugPrint('Failed to sync notes: $e');
       rethrow;
@@ -80,9 +85,21 @@ class DataSyncService {
       final jsonString = jsonEncode(notesJson);
 
       await file.writeAsString(jsonString);
+
+      // Trigger widget refresh after syncing
+      await triggerWidgetRefresh();
     } catch (e) {
       debugPrint('Failed to sync pinned notes: $e');
       rethrow;
+    }
+  }
+
+  /// Trigger widget refresh on all platforms
+  Future<void> triggerWidgetRefresh() async {
+    try {
+      await _widgetChannel.invokeMethod<void>('refreshWidgets');
+    } catch (e) {
+      debugPrint('Failed to trigger widget refresh: $e');
     }
   }
 
