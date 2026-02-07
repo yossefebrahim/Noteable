@@ -47,5 +47,9 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>AppGroups</key>
+		<array>
+			<string>group.com.noteable.app</string>
+		</array>
 	</dict>
 </plist>
