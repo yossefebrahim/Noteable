@@ -77,8 +77,13 @@ class ExportService {
   }
 
   /// Convert note to Markdown format
+  ///
+  /// Creates a properly formatted Markdown document with:
+  /// - Title as H1 heading (# Title)
+  /// - Blank line after heading for proper spacing
+  /// - Content with preserved line breaks
+  /// - Handles empty title or content gracefully
   String _convertToMarkdown(NoteModel note) {
-    // Markdown export will be fully implemented in subtask-2-2
     final buffer = StringBuffer();
 
     if (note.title.isNotEmpty) {
