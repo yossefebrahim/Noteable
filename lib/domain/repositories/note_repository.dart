@@ -15,4 +15,6 @@ abstract interface class NoteRepository implements BaseRepository {
   Future<Note> togglePinNote(String id);
 
   Future<List<Note>> searchNotes(String query);
+
+  Future<List<Note>> getNotesWithAudioAttachments();
 }
