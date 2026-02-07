@@ -1,6 +1,11 @@
 import 'package:get_it/get_it.dart';
+import 'package:noteable_app/data/repositories/audio_repository_impl.dart';
 import 'package:noteable_app/data/repositories/in_memory_notes_feature_repository.dart';
-import 'package:noteable_app/domain/repositories/notes_feature_repository.dart';
+import 'package:noteable_app/data/repositories/transcription_repository_impl.dart';
+import 'package:noteable_app/domain/repositories/audio_repository.dart';
+import 'package:noteable_app/domain/repositories/transcription_repository.dart';
+import 'package:noteable_app/domain/usecases/audio/create_audio_attachment_usecase.dart';
+import 'package:noteable_app/domain/usecases/audio/transcribe_audio_usecase.dart';
 import 'package:noteable_app/domain/usecases/feature_usecases.dart';
 import 'package:noteable_app/presentation/providers/app_provider.dart';
 import 'package:noteable_app/presentation/providers/note_detail_view_model.dart';
@@ -9,6 +14,7 @@ import 'package:noteable_app/services/audio/audio_player_service.dart';
 import 'package:noteable_app/services/audio/audio_recorder_service.dart';
 import 'package:noteable_app/services/audio/transcription_service.dart';
 import 'package:noteable_app/services/storage/file_storage_service.dart';
+import 'package:noteable_app/services/storage/isar_service.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -21,6 +27,17 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<AudioRecorderService>(AudioRecorderService.new);
   sl.registerLazySingleton<AudioPlayerService>(AudioPlayerService.new);
   sl.registerLazySingleton<TranscriptionService>(TranscriptionService.new);
+
+  // Isar service (shared by repositories)
+  sl.registerLazySingleton<IsarService>(IsarService.new);
+
+  // Audio repositories
+  sl.registerLazySingleton<AudioRepository>(() => AudioRepositoryImpl(sl()));
+  sl.registerLazySingleton<TranscriptionRepository>(() => TranscriptionRepositoryImpl(sl()));
+
+  // Audio use cases
+  sl.registerLazySingleton<CreateAudioAttachmentUseCase>(() => CreateAudioAttachmentUseCase(sl()));
+  sl.registerLazySingleton<TranscribeAudioUseCase>(() => TranscribeAudioUseCase(sl()));
 
   sl.registerLazySingleton<GetNotesUseCase>(() => GetNotesUseCase(sl()));
   sl.registerLazySingleton<CreateNoteUseCase>(() => CreateNoteUseCase(sl()));

@@ -4,17 +4,12 @@ import 'package:noteable_app/domain/repositories/transcription_repository.dart';
 
 class TranscribeAudioUseCase {
   final TranscriptionRepository _transcriptionRepository;
-  final String _audioFilePath;
 
-  TranscribeAudioUseCase({
-    required TranscriptionRepository transcriptionRepository,
-    required String audioFilePath,
-  }) : _transcriptionRepository = transcriptionRepository,
-       _audioFilePath = audioFilePath;
+  TranscribeAudioUseCase(this._transcriptionRepository);
 
-  Future<Result<Transcription>> call() async {
+  Future<Result<Transcription>> call(String audioFilePath) async {
     try {
-      final transcription = await _transcriptionRepository.transcribeAudio(_audioFilePath);
+      final transcription = await _transcriptionRepository.transcribeAudio(audioFilePath);
       return Result.success(transcription);
     } catch (e) {
       return Result.failure('Failed to transcribe audio: $e');

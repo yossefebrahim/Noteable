@@ -4,17 +4,12 @@ import 'package:noteable_app/domain/repositories/audio_repository.dart';
 
 class CreateAudioAttachmentUseCase {
   final AudioRepository _audioRepository;
-  final AudioAttachment _audioAttachment;
 
-  CreateAudioAttachmentUseCase({
-    required AudioRepository audioRepository,
-    required AudioAttachment audioAttachment,
-  }) : _audioRepository = audioRepository,
-       _audioAttachment = audioAttachment;
+  CreateAudioAttachmentUseCase(this._audioRepository);
 
-  Future<Result<AudioAttachment>> call() async {
+  Future<Result<AudioAttachment>> call(AudioAttachment audioAttachment) async {
     try {
-      final created = await _audioRepository.createAudioAttachment(_audioAttachment);
+      final created = await _audioRepository.createAudioAttachment(audioAttachment);
       return Result.success(created);
     } catch (e) {
       return Result.failure('Failed to create audio attachment: $e');
