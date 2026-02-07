@@ -65,24 +65,28 @@ struct NoteRow: View {
   let note: NoteDataModel
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 2) {
-      Text(note.title.isEmpty ? "Untitled" : note.title)
-        .font(.subheadline)
-        .fontWeight(.semibold)
-        .foregroundColor(.appTextPrimary)
-        .lineLimit(1)
+    Link(destination: URL(string: "noteable://note-detail/\(note.id)")!) {
+      VStack(alignment: .leading, spacing: 2) {
+        Text(note.title.isEmpty ? "Untitled" : note.title)
+          .font(.subheadline)
+          .fontWeight(.semibold)
+          .foregroundColor(.appTextPrimary)
+          .lineLimit(1)
 
-      Text(note.content.isEmpty ? "No content" : note.content)
-        .font(.caption)
-        .foregroundColor(.appTextSecondary)
-        .lineLimit(1)
+        Text(note.content.isEmpty ? "No content" : note.content)
+          .font(.caption)
+          .foregroundColor(.appTextSecondary)
+          .lineLimit(1)
+      }
+      .padding(.vertical, 4)
+      .padding(.horizontal, 8)
+      .background(
+        RoundedRectangle(cornerRadius: 6)
+          .fill(Color.appSurface)
+      )
+      .contentShape(Rectangle())
     }
-    .padding(.vertical, 4)
-    .padding(.horizontal, 8)
-    .background(
-      RoundedRectangle(cornerRadius: 6)
-        .fill(Color.appSurface)
-    )
+    .buttonStyle(PlainButtonStyle())
   }
 }
 

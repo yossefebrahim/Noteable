@@ -51,7 +51,7 @@ struct QuickCaptureWidgetEntryView: View {
       )
       .padding(8)
     }
-    .widgetURL(URL(string: "noteable://quick-capture"))
+    .widgetURL(URL(string: "noteable://note-detail"))
   }
 }
 

@@ -81,33 +81,37 @@ struct PinnedNoteCard: View {
   let note: NoteDataModel
 
   var body: some View {
-    HStack(alignment: .top, spacing: 8) {
-      Image(systemName: "pin.fill")
-        .font(.caption)
-        .foregroundColor(.appAccent)
-        .padding(.top, 2)
-
-      VStack(alignment: .leading, spacing: 3) {
-        Text(note.title.isEmpty ? "Untitled" : note.title)
-          .font(.subheadline)
-          .fontWeight(.semibold)
-          .foregroundColor(.appTextPrimary)
-          .lineLimit(1)
-
-        Text(note.content.isEmpty ? "No content" : note.content)
+    Link(destination: URL(string: "noteable://note-detail/\(note.id)")!) {
+      HStack(alignment: .top, spacing: 8) {
+        Image(systemName: "pin.fill")
           .font(.caption)
-          .foregroundColor(.appTextSecondary)
-          .lineLimit(2)
-      }
+          .foregroundColor(.appAccent)
+          .padding(.top, 2)
 
-      Spacer()
+        VStack(alignment: .leading, spacing: 3) {
+          Text(note.title.isEmpty ? "Untitled" : note.title)
+            .font(.subheadline)
+            .fontWeight(.semibold)
+            .foregroundColor(.appTextPrimary)
+            .lineLimit(1)
+
+          Text(note.content.isEmpty ? "No content" : note.content)
+            .font(.caption)
+            .foregroundColor(.appTextSecondary)
+            .lineLimit(2)
+        }
+
+        Spacer()
+      }
+      .padding(.vertical, 6)
+      .padding(.horizontal, 10)
+      .background(
+        RoundedRectangle(cornerRadius: 8)
+          .fill(Color.appSurface)
+      )
+      .contentShape(Rectangle())
     }
-    .padding(.vertical, 6)
-    .padding(.horizontal, 10)
-    .background(
-      RoundedRectangle(cornerRadius: 8)
-        .fill(Color.appSurface)
-    )
+    .buttonStyle(PlainButtonStyle())
   }
 }
 
