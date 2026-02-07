@@ -12,4 +12,10 @@ Future<void> runIsarMigrations({
   if (from >= to) return;
 
   // v1 baseline - no-op.
+
+  // v2 - Added AudioAttachmentModel and TranscriptionModel collections
+  // This is a non-breaking change (new collections only), no manual migration needed.
+  if (from < 2) {
+    // Isar automatically handles new collections
+  }
 }
