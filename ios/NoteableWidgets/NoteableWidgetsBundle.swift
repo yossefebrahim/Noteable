@@ -6,5 +6,6 @@ struct NoteableWidgetsBundle: WidgetBundle {
   var body: some Widget {
     QuickCaptureWidget()
     NoteableWidget()
+    RecentNotesWidget()
   }
 }
