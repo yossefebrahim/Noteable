@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import '../providers/note_provider.dart';
 
 class NoteCard extends StatefulWidget {
-  const NoteCard({super.key, required this.note, this.onTap, this.onPinTap});
+  const NoteCard({super.key, required this.note, this.onTap, this.onPinTap, this.onLongPress});
 
   final NoteItem note;
   final VoidCallback? onTap;
   final VoidCallback? onPinTap;
+  final VoidCallback? onLongPress;
 
   @override
   State<NoteCard> createState() => _NoteCardState();
@@ -24,6 +25,7 @@ class _NoteCardState extends State<NoteCard> {
       onTapUp: (_) => setState(() => _scale = 1),
       onTapCancel: () => setState(() => _scale = 1),
       onTap: widget.onTap,
+      onLongPress: widget.onLongPress,
       child: AnimatedScale(
         scale: _scale,
         duration: const Duration(milliseconds: 100),

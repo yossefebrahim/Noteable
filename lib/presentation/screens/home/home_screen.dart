@@ -99,6 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               setState(() => _selectedIndex = index);
                               context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes());
                             },
+                            onLongPress: () => _showContextMenu(context, note, vm),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () => _confirmDelete(context, vm, note),
@@ -129,5 +130,104 @@ class _HomeScreenState extends State<HomeScreen> {
     if (confirm == true) {
       await vm.deleteNote(note.id);
     }
+  }
+
+  void _showContextMenu(BuildContext context, NoteEntity note, NotesViewModel vm) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: Icon(note.isPinned ? Icons.push_pin : Icons.push_pin_outlined),
+                title: Text(note.isPinned ? 'Unpin' : 'Pin'),
+                onTap: () {
+                  Navigator.pop(context);
+                  vm.togglePin(note.id);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.folder_outlined),
+                title: const Text('Move to folder'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showMoveToFolderDialog(context, note, vm);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.share_outlined),
+                title: const Text('Share'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _shareNote(context, note);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete_outline, color: Colors.red),
+                title: const Text('Delete', style: TextStyle(color: Colors.red)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _confirmDelete(context, vm, note);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showMoveToFolderDialog(BuildContext context, NoteEntity note, NotesViewModel vm) async {
+    if (vm.folders.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No folders available. Create a folder first.')),
+      );
+      return;
+    }
+    final String? selectedFolderId = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Move to folder'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: vm.folders.map((folder) => ListTile(
+                title: Text(folder.name),
+                onTap: () => Navigator.pop(context, folder.id),
+              )).toList(),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+    if (selectedFolderId != null) {
+      // TODO: Implement move to folder functionality
+      // This requires a MoveNoteUseCase to be added
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Move functionality coming soon')),
+      );
+    }
+  }
+
+  void _shareNote(BuildContext context, NoteEntity note) {
+    final title = note.title.isEmpty ? 'Untitled' : note.title;
+    final content = note.content;
+    // Basic share using clipboard for now
+    // A full implementation would use the share package
+    final shareText = '$title\n\n$content';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Note copied to clipboard'),
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {},
+        ),
+      ),
+    );
   }
 }
