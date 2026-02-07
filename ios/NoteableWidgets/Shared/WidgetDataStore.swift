@@ -22,6 +22,11 @@ class WidgetDataStore {
     return notes.sorted { $0.updatedAt > $1.updatedAt }
   }
 
+  func fetchPinnedNotes() -> [NoteDataModel] {
+    let notes = fetchNotes()
+    return notes.filter { $0.isPinned }.sorted { $0.updatedAt > $1.updatedAt }
+  }
+
   func saveNote(_ note: NoteDataModel) {
     var notes = fetchNotes()
 

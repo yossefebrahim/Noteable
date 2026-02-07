@@ -3,7 +3,7 @@
   "spec": "002-quick-capture-widgets",
   "state": "building",
   "subtasks": {
-    "completed": 5,
+    "completed": 6,
     "total": 17,
     "in_progress": 1,
     "failed": 0
@@ -18,8 +18,8 @@
     "max": 1
   },
   "session": {
-    "number": 7,
+    "number": 8,
     "started_at": "2026-02-08T00:29:45.925227"
   },
-  "last_update": "2026-02-08T00:52:58.357496"
+  "last_update": "2026-02-08T00:56:23.434322"
 }

@@ -7,5 +7,6 @@ struct NoteableWidgetsBundle: WidgetBundle {
     QuickCaptureWidget()
     NoteableWidget()
     RecentNotesWidget()
+    PinnedNotesWidget()
   }
 }
