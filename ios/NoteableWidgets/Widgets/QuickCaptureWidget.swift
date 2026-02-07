@@ -19,35 +19,37 @@ struct QuickCaptureWidgetEntryView: View {
 
   var body: some View {
     ZStack {
-      LinearGradient(
-        gradient: Gradient(colors: [Color.orange.opacity(0.7), Color.red.opacity(0.7)]),
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-      )
+      Color.appBackground
 
       VStack(spacing: 12) {
         Image(systemName: "plus.circle.fill")
           .font(.system(size: 32))
-          .foregroundColor(.white)
+          .foregroundColor(.appAccent)
 
         Text("Quick Capture")
           .font(.headline)
           .fontWeight(.bold)
-          .foregroundColor(.white)
+          .foregroundColor(.appTextPrimary)
 
         if let recentCount = entry.recentNoteCount, recentCount > 0 {
           Text("\(recentCount) \(recentCount == 1 ? "note" : "notes")")
             .font(.caption2)
-            .foregroundColor(.white.opacity(0.9))
+            .foregroundColor(.appTextSecondary)
         } else {
           Text("Tap to capture")
             .font(.caption2)
-            .foregroundColor(.white.opacity(0.8))
+            .foregroundColor(.appTextSecondary)
         }
 
         Spacer()
       }
       .padding()
+      .background(
+        RoundedRectangle(cornerRadius: 16)
+          .fill(Color.appSurface)
+          .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+      )
+      .padding(8)
     }
     .widgetURL(URL(string: "noteable://quick-capture"))
   }

@@ -19,25 +19,21 @@ struct RecentNotesWidgetEntryView: View {
 
   var body: some View {
     ZStack {
-      LinearGradient(
-        gradient: Gradient(colors: [Color.green.opacity(0.6), Color.teal.opacity(0.6)]),
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-      )
+      Color.appBackground
 
       VStack(alignment: .leading, spacing: 8) {
         Text("Recent Notes")
           .font(.headline)
-          .foregroundColor(.white)
+          .foregroundColor(.appTextPrimary)
 
         if entry.notes.isEmpty {
           VStack {
             Text("No notes yet")
               .font(.subheadline)
-              .foregroundColor(.white.opacity(0.8))
+              .foregroundColor(.appTextSecondary)
             Text("Create your first note")
               .font(.caption)
-              .foregroundColor(.white.opacity(0.7))
+              .foregroundColor(.appTextSecondary.opacity(0.8))
           }
           .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
@@ -49,7 +45,7 @@ struct RecentNotesWidgetEntryView: View {
             if entry.notes.count > 3 {
               Text("+ \(entry.notes.count - 3) more")
                 .font(.caption2)
-                .foregroundColor(.white.opacity(0.7))
+                .foregroundColor(.appTextSecondary)
             }
           }
 
@@ -57,7 +53,7 @@ struct RecentNotesWidgetEntryView: View {
 
           Text("Updated: \(entry.date, style: .time)")
             .font(.caption2)
-            .foregroundColor(.white.opacity(0.7))
+            .foregroundColor(.appTextSecondary)
         }
       }
       .padding()
@@ -73,19 +69,19 @@ struct NoteRow: View {
       Text(note.title.isEmpty ? "Untitled" : note.title)
         .font(.subheadline)
         .fontWeight(.semibold)
-        .foregroundColor(.white)
+        .foregroundColor(.appTextPrimary)
         .lineLimit(1)
 
       Text(note.content.isEmpty ? "No content" : note.content)
         .font(.caption)
-        .foregroundColor(.white.opacity(0.85))
+        .foregroundColor(.appTextSecondary)
         .lineLimit(1)
     }
     .padding(.vertical, 4)
     .padding(.horizontal, 8)
     .background(
       RoundedRectangle(cornerRadius: 6)
-        .fill(Color.white.opacity(0.15))
+        .fill(Color.appSurface)
     )
   }
 }

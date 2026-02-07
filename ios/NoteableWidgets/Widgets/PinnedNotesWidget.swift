@@ -19,37 +19,33 @@ struct PinnedNotesWidgetEntryView: View {
 
   var body: some View {
     ZStack {
-      LinearGradient(
-        gradient: Gradient(colors: [Color.purple.opacity(0.6), Color.pink.opacity(0.6)]),
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-      )
+      Color.appBackground
 
       VStack(alignment: .leading, spacing: 8) {
         HStack {
           Text("Pinned Notes")
             .font(.headline)
-            .foregroundColor(.white)
+            .foregroundColor(.appTextPrimary)
 
           Spacer()
 
           Image(systemName: "pin.fill")
-            .foregroundColor(.white.opacity(0.8))
+            .foregroundColor(.appAccent)
         }
 
         if entry.notes.isEmpty {
           VStack(spacing: 8) {
             Image(systemName: "pin.slash")
               .font(.system(size: 32))
-              .foregroundColor(.white.opacity(0.6))
+              .foregroundColor(.appTextSecondary.opacity(0.6))
 
             Text("No pinned notes")
               .font(.subheadline)
-              .foregroundColor(.white.opacity(0.8))
+              .foregroundColor(.appTextSecondary)
 
             Text("Pin important notes to see them here")
               .font(.caption)
-              .foregroundColor(.white.opacity(0.7))
+              .foregroundColor(.appTextSecondary.opacity(0.8))
               .multilineTextAlignment(.center)
           }
           .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -63,7 +59,7 @@ struct PinnedNotesWidgetEntryView: View {
               if entry.notes.count > 6 {
                 Text("+ \(entry.notes.count - 6) more pinned notes")
                   .font(.caption2)
-                  .foregroundColor(.white.opacity(0.7))
+                  .foregroundColor(.appTextSecondary)
                   .frame(maxWidth: .infinity, alignment: .center)
               }
             }
@@ -73,7 +69,7 @@ struct PinnedNotesWidgetEntryView: View {
 
           Text("Updated: \(entry.date, style: .time)")
             .font(.caption2)
-            .foregroundColor(.white.opacity(0.7))
+            .foregroundColor(.appTextSecondary)
         }
       }
       .padding()
@@ -88,19 +84,19 @@ struct PinnedNoteCard: View {
     HStack(alignment: .top, spacing: 8) {
       Image(systemName: "pin.fill")
         .font(.caption)
-        .foregroundColor(.white.opacity(0.7))
+        .foregroundColor(.appAccent)
         .padding(.top, 2)
 
       VStack(alignment: .leading, spacing: 3) {
         Text(note.title.isEmpty ? "Untitled" : note.title)
           .font(.subheadline)
           .fontWeight(.semibold)
-          .foregroundColor(.white)
+          .foregroundColor(.appTextPrimary)
           .lineLimit(1)
 
         Text(note.content.isEmpty ? "No content" : note.content)
           .font(.caption)
-          .foregroundColor(.white.opacity(0.85))
+          .foregroundColor(.appTextSecondary)
           .lineLimit(2)
       }
 
@@ -110,7 +106,7 @@ struct PinnedNoteCard: View {
     .padding(.horizontal, 10)
     .background(
       RoundedRectangle(cornerRadius: 8)
-        .fill(Color.white.opacity(0.15))
+        .fill(Color.appSurface)
     )
   }
 }
