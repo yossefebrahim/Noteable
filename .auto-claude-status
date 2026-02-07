@@ -3,7 +3,7 @@
   "spec": "007-note-export-sharing",
   "state": "building",
   "subtasks": {
-    "completed": 1,
+    "completed": 3,
     "total": 25,
     "in_progress": 1,
     "failed": 0
@@ -18,8 +18,8 @@
     "max": 1
   },
   "session": {
-    "number": 3,
+    "number": 5,
     "started_at": "2026-02-08T01:21:24.995924"
   },
-  "last_update": "2026-02-08T01:29:42.667332"
+  "last_update": "2026-02-08T01:34:41.001501"
 }
