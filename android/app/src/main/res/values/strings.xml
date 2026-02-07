@@ -19,4 +19,10 @@
     <string name="no_recent_notes">No recent notes</string>
     <string name="untitled_note">Untitled</string>
     <string name="tap_to_view">Tap to view</string>
+
+    <!-- Pinned Notes Widget -->
+    <string name="pinned_notes_title">Pinned Notes</string>
+    <string name="pinned_notes_widget_description">View your pinned notes</string>
+    <string name="no_pinned_notes">No pinned notes</string>
+    <string name="pinned_note_icon">Pinned</string>
 </resources>
