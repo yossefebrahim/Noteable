@@ -4,7 +4,6 @@ import 'package:noteable_app/data/repositories/template_repository_impl.dart';
 import 'package:noteable_app/domain/repositories/notes_feature_repository.dart';
 import 'package:noteable_app/domain/repositories/template_repository.dart';
 import 'package:noteable_app/domain/usecases/feature_usecases.dart';
-import 'package:noteable_app/domain/usecases/template/apply_template_usecase.dart';
 import 'package:noteable_app/domain/usecases/template/create_template_usecase.dart';
 import 'package:noteable_app/domain/usecases/template/delete_template_usecase.dart';
 import 'package:noteable_app/domain/usecases/template/get_templates_usecase.dart';
@@ -39,8 +38,9 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<CreateTemplateUseCase>(() => CreateTemplateUseCase(sl()));
   sl.registerLazySingleton<UpdateTemplateUseCase>(() => UpdateTemplateUseCase(sl()));
   sl.registerLazySingleton<DeleteTemplateUseCase>(() => DeleteTemplateUseCase(sl()));
-  sl.registerLazySingleton<ApplyTemplateUseCase>(() => ApplyTemplateUseCase(sl()));
   sl.registerLazySingleton<ImportExportTemplatesUseCase>(() => ImportExportTemplatesUseCase(sl()));
+  // Note: ApplyTemplateUseCase is NOT registered as a singleton because it requires
+  // a TemplateEntity parameter at construction time. It's created directly when needed.
 
   sl.registerFactory<NotesViewModel>(
     () => NotesViewModel(

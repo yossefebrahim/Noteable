@@ -3,23 +3,23 @@
   "spec": "004-note-templates",
   "state": "building",
   "subtasks": {
-    "completed": 12,
+    "completed": 18,
     "total": 19,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Presentation Layer",
+    "current": "Integration",
     "id": null,
-    "total": 4
+    "total": 5
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 13,
+    "number": 17,
     "started_at": "2026-02-08T00:31:28.972157"
   },
-  "last_update": "2026-02-08T01:13:08.184112"
+  "last_update": "2026-02-08T01:29:56.388640"
 }

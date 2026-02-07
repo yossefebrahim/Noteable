@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:noteable_app/domain/entities/template_entity.dart';
-import 'package:noteable_app/domain/usecases/template/apply_template_usecase.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/note_detail_view_model.dart';
@@ -168,14 +167,12 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   }
 
   Future<void> _applyTemplate(TemplateEntity template) async {
-    final applyTemplate = ApplyTemplateUseCase(template: template);
-    final result = await applyTemplate();
-    if (result.isSuccess && result.data != null) {
-      final applied = result.data!;
-      _titleController.text = applied.title;
-      _contentController.text = applied.content;
-      final NoteEditorViewModel vm = context.read<NoteEditorViewModel>();
-      vm.updateDraft(title: applied.title, content: applied.content);
+    final NoteEditorViewModel vm = context.read<NoteEditorViewModel>();
+    await vm.applyTemplate(template);
+    final note = vm.note;
+    if (note != null) {
+      _titleController.text = note.title;
+      _contentController.text = note.content;
     }
   }
 }
