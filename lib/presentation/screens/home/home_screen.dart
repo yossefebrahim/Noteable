@@ -52,6 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 () => context.push('/note-detail').then((_) => vm.refreshNotes()),
             const SingleActivator(LogicalKeyboardKey.keyF, control: true, meta: true):
                 () => context.push('/search'),
+            const SingleActivator(LogicalKeyboardKey.slash, shift: true, control: true, meta: true):
+                () => context.push('/keyboard-shortcuts'),
           },
           child: Focus(
             autofocus: true,
@@ -60,6 +62,11 @@ class _HomeScreenState extends State<HomeScreen> {
               appBar: AppBar(
                 title: const Text('Notes'),
                 actions: <Widget>[
+                  IconButton(
+                    onPressed: () => context.push('/keyboard-shortcuts'),
+                    icon: const Icon(Icons.help_outline),
+                    tooltip: 'Keyboard shortcuts',
+                  ),
                   IconButton(onPressed: () => context.push('/search'), icon: const Icon(Icons.search_rounded)),
                   IconButton(onPressed: () => context.push('/folders'), icon: const Icon(Icons.folder_outlined)),
                   IconButton(onPressed: () => context.push('/settings'), icon: const Icon(Icons.settings_outlined)),
