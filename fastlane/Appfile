@@ -1,0 +1,8 @@
+app_identifier("com.noteable.app")
+
+apple_id(ENV["APPLE_ID"])
+itc_team_id(ENV["APP_STORE_CONNECT_TEAM_ID"])
+team_id(ENV["APPLE_DEVELOPER_TEAM_ID"])
+
+json_key_file(ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"])
+package_name("com.noteable.app")

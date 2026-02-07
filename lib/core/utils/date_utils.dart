@@ -1,0 +1,3 @@
+class AppDateUtils {
+  AppDateUtils._();
+}

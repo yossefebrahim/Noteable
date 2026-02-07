@@ -1,0 +1,19 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  errors:
+    invalid_annotation_target: ignore
+
+formatter:
+  page_width: 100
+
+linter:
+  rules:
+    prefer_single_quotes: true
+    always_declare_return_types: true
+    avoid_print: true
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    directives_ordering: true
+    unawaited_futures: true
+    sort_pub_dependencies: false

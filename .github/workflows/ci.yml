@@ -1,0 +1,35 @@
+name: noteable-ci
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+
+jobs:
+  test-and-build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Static analysis
+        run: flutter analyze lib test
+
+      - name: Unit/Widget tests
+        run: flutter test
+
+      - name: Build Android APK (debug)
+        run: flutter build apk --debug
+
+      - name: Build iOS (no codesign)
+        run: flutter build ios --debug --no-codesign
