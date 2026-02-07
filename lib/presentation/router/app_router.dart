@@ -23,13 +23,31 @@ class AppRouter {
       ),
       GoRoute(
         path: '/note-detail',
-        pageBuilder: (BuildContext context, GoRouterState state) => _animatedPage(
-          state: state,
-          child: ChangeNotifierProvider<NoteEditorViewModel>(
-            create: (_) => sl<NoteEditorViewModel>(),
-            child: NoteDetailScreen(noteId: state.extra as String?),
-          ),
-        ),
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          // Handle internal navigation with extra parameter (for creating new notes or editing)
+          final String? noteId = state.extra as String?;
+          return _animatedPage(
+            state: state,
+            child: ChangeNotifierProvider<NoteEditorViewModel>(
+              create: (_) => sl<NoteEditorViewModel>(),
+              child: NoteDetailScreen(noteId: noteId),
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/note-detail/:id',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          // Handle deep links with note ID in the path (for widget-to-app navigation)
+          final String? noteId = state.pathParameters['id'];
+          return _animatedPage(
+            state: state,
+            child: ChangeNotifierProvider<NoteEditorViewModel>(
+              create: (_) => sl<NoteEditorViewModel>(),
+              child: NoteDetailScreen(noteId: noteId),
+            ),
+          );
+        },
       ),
       GoRoute(
         path: '/folders',
