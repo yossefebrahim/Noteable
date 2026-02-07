@@ -3,23 +3,23 @@
   "spec": "002-quick-capture-widgets",
   "state": "building",
   "subtasks": {
-    "completed": 11,
-    "total": 17,
-    "in_progress": 1,
+    "completed": 14,
+    "total": 19,
+    "in_progress": 0,
     "failed": 0
   },
   "phase": {
-    "current": "Android Widget Implementation",
+    "current": "Integration & Deep Linking",
     "id": null,
-    "total": 5
+    "total": 4
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 13,
+    "number": 15,
     "started_at": "2026-02-08T00:29:45.925227"
   },
-  "last_update": "2026-02-08T01:19:50.750994"
+  "last_update": "2026-02-08T01:45:00.000000"
 }
