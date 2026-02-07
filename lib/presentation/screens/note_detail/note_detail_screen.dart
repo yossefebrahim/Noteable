@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/note_detail_view_model.dart';
@@ -36,6 +37,41 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     });
   }
 
+  Future<void> _handleSave() async {
+    final NoteEditorViewModel vm = context.read<NoteEditorViewModel>();
+    vm.updateDraft(title: _titleController.text, content: _contentController.text);
+    await vm.saveNow();
+    if (!context.mounted) return;
+    final NotesViewModel notesVm = context.read<NotesViewModel>();
+    await notesVm.refreshNotes();
+    if (!context.mounted) return;
+    Navigator.pop(context);
+  }
+
+  void _applyFormatting(String marker) {
+    final TextSelection selection = _contentController.selection;
+    final String text = _contentController.text;
+
+    if (selection.isCollapsed) {
+      // No text selected, insert marker at cursor
+      final int cursorPos = selection.baseOffset;
+      _contentController.value = TextEditingValue(
+        text: text.substring(0, cursorPos) + marker + text.substring(cursorPos),
+        selection: TextSelection.collapsed(offset: cursorPos + marker.length),
+      );
+    } else {
+      // Text selected, wrap it with marker
+      final int start = selection.start;
+      final int end = selection.end;
+      final String selectedText = text.substring(start, end);
+      _contentController.value = TextEditingValue(
+        text: text.substring(0, start) + marker + selectedText + marker + text.substring(end),
+        selection: TextSelection.collapsed(offset: start + marker.length * 2 + selectedText.length),
+      );
+    }
+    context.read<NoteEditorViewModel>().updateDraft(content: _contentController.text);
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -49,57 +85,62 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     final bool isPinned = context.select<NoteEditorViewModel, bool>((NoteEditorViewModel vm) => vm.note?.isPinned ?? false);
     final bool isSaving = context.select<NoteEditorViewModel, bool>((NoteEditorViewModel vm) => vm.isSaving);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditing ? 'Note Details' : 'New Note'),
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              final NoteEditorViewModel vm = context.read<NoteEditorViewModel>();
-              final note = vm.note;
-              if (note == null) return;
-              vm.updateDraft(isPinned: !note.isPinned);
-            },
-            icon: Icon(isPinned ? Icons.push_pin : Icons.push_pin_outlined),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            child: AppButton(
-              label: 'Save',
-              isLoading: isSaving,
-              onPressed: () async {
-                final NoteEditorViewModel vm = context.read<NoteEditorViewModel>();
-                vm.updateDraft(title: _titleController.text, content: _contentController.text);
-                await vm.saveNow();
-                if (!context.mounted) return;
-                final notesVm = context.read<NotesViewModel>();
-                await notesVm.refreshNotes();
-                if (!context.mounted) return;
-                Navigator.pop(context);
-              },
-            ),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: <Widget>[
-            AppTextField(
-              controller: _titleController,
-              hintText: 'Note title',
-              onChanged: (String value) => context.read<NoteEditorViewModel>().updateDraft(title: value),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: AppTextField(
-                controller: _contentController,
-                hintText: 'Start writing...',
-                maxLines: null,
-                onChanged: (String value) => context.read<NoteEditorViewModel>().updateDraft(content: value),
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.keyS, control: true, meta: true): _handleSave,
+        const SingleActivator(LogicalKeyboardKey.digit1, control: true, meta: true):
+            () => _applyFormatting('# '),
+        const SingleActivator(LogicalKeyboardKey.digit2, control: true, meta: true):
+            () => _applyFormatting('**'),
+        const SingleActivator(LogicalKeyboardKey.digit3, control: true, meta: true):
+            () => _applyFormatting('*'),
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(isEditing ? 'Note Details' : 'New Note'),
+            actions: <Widget>[
+              IconButton(
+                onPressed: () {
+                  final NoteEditorViewModel vm = context.read<NoteEditorViewModel>();
+                  final note = vm.note;
+                  if (note == null) return;
+                  vm.updateDraft(isPinned: !note.isPinned);
+                },
+                icon: Icon(isPinned ? Icons.push_pin : Icons.push_pin_outlined),
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                child: AppButton(
+                  label: 'Save',
+                  isLoading: isSaving,
+                  onPressed: _handleSave,
+                ),
+              ),
+            ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: <Widget>[
+                AppTextField(
+                  controller: _titleController,
+                  hintText: 'Note title',
+                  onChanged: (String value) => context.read<NoteEditorViewModel>().updateDraft(title: value),
+                ),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: AppTextField(
+                    controller: _contentController,
+                    hintText: 'Start writing...',
+                    maxLines: null,
+                    onChanged: (String value) => context.read<NoteEditorViewModel>().updateDraft(content: value),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
