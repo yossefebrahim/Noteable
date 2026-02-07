@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/app_provider.dart';
+import '../../providers/keyboard_shortcuts_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -60,7 +61,9 @@ class SettingsScreen extends StatelessWidget {
               subtitle: const Text('Modify keyboard shortcuts for quick actions'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
-                // TODO: Navigate to keyboard shortcuts customization screen
+                // Navigate to shortcuts help screen as a minimal implementation
+                // A full customization screen could be added in the future
+                context.push('/shortcuts-help');
               },
             ),
           ),
@@ -80,8 +83,32 @@ class SettingsScreen extends StatelessWidget {
               leading: const Icon(Icons.restore),
               title: const Text('Reset to Defaults'),
               subtitle: const Text('Restore default keyboard shortcuts'),
-              onTap: () {
-                // TODO: Show confirmation dialog and reset shortcuts
+              onTap: () async {
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Reset Shortcuts'),
+                    content: const Text('Reset all keyboard shortcuts to their default values?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Cancel'),
+                      ),
+                      FilledButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('Reset'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirmed == true && context.mounted) {
+                  final provider = context.read<KeyboardShortcutsProvider>();
+                  provider.resetToDefaults();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Shortcuts reset to defaults')),
+                  );
+                }
               },
             ),
           ),

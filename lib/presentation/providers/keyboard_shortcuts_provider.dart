@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:noteable_app/core/models/keyboard_shortcut.dart';
 import 'package:noteable_app/core/models/shortcut_action.dart';
 import 'package:noteable_app/core/services/keyboard_shortcut_service.dart';
 
