@@ -9,6 +9,7 @@ import '../screens/home/home_screen.dart';
 import '../screens/note_detail/note_detail_screen.dart';
 import '../screens/search/search_screen.dart';
 import '../screens/settings/settings_screen.dart';
+import '../screens/shortcuts_help/shortcuts_help_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -45,6 +46,11 @@ class AppRouter {
         path: '/settings',
         pageBuilder: (BuildContext context, GoRouterState state) =>
             _animatedPage(state: state, child: const SettingsScreen()),
+      ),
+      GoRoute(
+        path: '/shortcuts-help',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            _animatedPage(state: state, child: const ShortcutsHelpScreen()),
       ),
     ],
   );

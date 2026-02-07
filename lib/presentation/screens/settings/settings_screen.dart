@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/app_provider.dart';
@@ -70,7 +71,7 @@ class SettingsScreen extends StatelessWidget {
               subtitle: const Text('See all available keyboard shortcuts'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
-                // TODO: Show keyboard shortcuts reference dialog
+                context.push('/shortcuts-help');
               },
             ),
           ),
