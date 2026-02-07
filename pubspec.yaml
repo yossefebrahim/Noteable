@@ -30,6 +30,7 @@ dependencies:
   record: ^5.1.0
   just_audio: ^0.9.36
   permission_handler: ^11.0.0
+  speech_to_text: ^6.6.0
 
   # Code Generation
   freezed_annotation: ^2.4.0
