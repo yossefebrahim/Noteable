@@ -5,12 +5,22 @@ import 'package:noteable_app/domain/usecases/feature_usecases.dart';
 import 'package:noteable_app/presentation/providers/app_provider.dart';
 import 'package:noteable_app/presentation/providers/note_detail_view_model.dart';
 import 'package:noteable_app/presentation/providers/notes_view_model.dart';
+import 'package:noteable_app/services/audio/audio_player_service.dart';
+import 'package:noteable_app/services/audio/audio_recorder_service.dart';
+import 'package:noteable_app/services/audio/transcription_service.dart';
+import 'package:noteable_app/services/storage/file_storage_service.dart';
 
 final GetIt sl = GetIt.instance;
 
 Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<AppProvider>(AppProvider.new);
   sl.registerLazySingleton<NotesFeatureRepository>(InMemoryNotesFeatureRepository.new);
+
+  // Audio services
+  sl.registerLazySingleton<FileStorageService>(FileStorageService.new);
+  sl.registerLazySingleton<AudioRecorderService>(AudioRecorderService.new);
+  sl.registerLazySingleton<AudioPlayerService>(AudioPlayerService.new);
+  sl.registerLazySingleton<TranscriptionService>(TranscriptionService.new);
 
   sl.registerLazySingleton<GetNotesUseCase>(() => GetNotesUseCase(sl()));
   sl.registerLazySingleton<CreateNoteUseCase>(() => CreateNoteUseCase(sl()));
