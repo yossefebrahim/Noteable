@@ -8,6 +8,7 @@ class NoteItem {
     required this.updatedAt,
     this.isPinned = false,
     this.folderName,
+    this.audioAttachmentCount = 0,
   });
 
   final String id;
@@ -16,6 +17,7 @@ class NoteItem {
   final DateTime updatedAt;
   final bool isPinned;
   final String? folderName;
+  final int audioAttachmentCount;
 
   NoteItem copyWith({
     String? id,
@@ -24,6 +26,7 @@ class NoteItem {
     DateTime? updatedAt,
     bool? isPinned,
     String? folderName,
+    int? audioAttachmentCount,
   }) {
     return NoteItem(
       id: id ?? this.id,
@@ -32,6 +35,7 @@ class NoteItem {
       updatedAt: updatedAt ?? this.updatedAt,
       isPinned: isPinned ?? this.isPinned,
       folderName: folderName ?? this.folderName,
+      audioAttachmentCount: audioAttachmentCount ?? this.audioAttachmentCount,
     );
   }
 }

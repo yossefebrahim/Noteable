@@ -11,9 +11,20 @@ class InMemoryNotesFeatureRepository implements NotesFeatureRepository {
   int _folderSeed = 0;
 
   @override
-  Future<NoteEntity> createNote({String? folderId, String title = '', String content = ''}) async {
+  Future<NoteEntity> createNote({
+    String? folderId,
+    String title = '',
+    String content = '',
+    bool isPinned = false,
+  }) async {
     final String id = 'n_${++_noteSeed}';
-    final NoteEntity note = NoteEntity(id: id, title: title, content: content, folderId: folderId);
+    final NoteEntity note = NoteEntity(
+      id: id,
+      title: title,
+      content: content,
+      folderId: folderId,
+      isPinned: isPinned,
+    );
     _notes[id] = note;
     return note;
   }
@@ -61,7 +72,10 @@ class InMemoryNotesFeatureRepository implements NotesFeatureRepository {
       return getNotes();
     }
     return (await getNotes())
-        .where((NoteEntity n) => n.title.toLowerCase().contains(q) || n.content.toLowerCase().contains(q))
+        .where(
+          (NoteEntity n) =>
+              n.title.toLowerCase().contains(q) || n.content.toLowerCase().contains(q),
+        )
         .toList();
   }
 
@@ -101,7 +115,9 @@ class InMemoryNotesFeatureRepository implements NotesFeatureRepository {
   @override
   Future<List<FolderEntity>> getFolders() async {
     final List<FolderEntity> list = _folders.values.toList()
-      ..sort((FolderEntity a, FolderEntity b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      ..sort(
+        (FolderEntity a, FolderEntity b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+      );
     return list;
   }
 

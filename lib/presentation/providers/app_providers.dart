@@ -1,4 +1,6 @@
 import 'package:noteable_app/presentation/providers/app_provider.dart';
+import 'package:noteable_app/presentation/providers/audio_player_provider.dart';
+import 'package:noteable_app/presentation/providers/audio_recorder_provider.dart';
 import 'package:noteable_app/presentation/providers/notes_view_model.dart';
 import 'package:noteable_app/services/di/service_locator.dart';
 import 'package:provider/provider.dart';
@@ -10,5 +12,11 @@ class AppProviders {
   static final List<SingleChildWidget> providers = <SingleChildWidget>[
     ChangeNotifierProvider<AppProvider>(create: (_) => sl<AppProvider>()),
     ChangeNotifierProvider<NotesViewModel>(create: (_) => sl<NotesViewModel>()),
+    ChangeNotifierProvider<AudioRecorderProvider>(
+      create: (_) => sl<AudioRecorderProvider>(),
+    ),
+    ChangeNotifierProvider<AudioPlayerProvider>(
+      create: (_) => sl<AudioPlayerProvider>(),
+    ),
   ];
 }

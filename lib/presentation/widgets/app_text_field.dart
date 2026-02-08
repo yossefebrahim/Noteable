@@ -8,6 +8,7 @@ class AppTextField extends StatelessWidget {
     this.controller,
     this.hintText,
     this.maxLines = 1,
+    this.minLines,
     this.onChanged,
     this.prefixIcon,
   });
@@ -15,6 +16,7 @@ class AppTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String? hintText;
   final int? maxLines;
+  final int? minLines;
   final ValueChanged<String>? onChanged;
   final Widget? prefixIcon;
 
@@ -24,6 +26,7 @@ class AppTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       maxLines: maxLines,
+      minLines: minLines,
       onChanged: onChanged,
       style: AppTextStyles.body,
       decoration: InputDecoration(

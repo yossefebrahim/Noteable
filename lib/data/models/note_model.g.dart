@@ -94,7 +94,14 @@ const NoteModelSchema = CollectionSchema(
       ],
     )
   },
-  links: {},
+  links: {
+    r'audioAttachments': LinkSchema(
+      id: 3681805257821366647,
+      name: r'audioAttachments',
+      target: r'AudioAttachmentModel',
+      single: false,
+    )
+  },
   embeddedSchemas: {},
   getId: _noteModelGetId,
   getLinks: _noteModelGetLinks,
@@ -180,11 +187,13 @@ Id _noteModelGetId(NoteModel object) {
 }
 
 List<IsarLinkBase<dynamic>> _noteModelGetLinks(NoteModel object) {
-  return [];
+  return [object.audioAttachments];
 }
 
 void _noteModelAttach(IsarCollection<dynamic> col, Id id, NoteModel object) {
   object.id = id;
+  object.audioAttachments.attach(col,
+      col.isar.collection<AudioAttachmentModel>(), r'audioAttachments', id);
 }
 
 extension NoteModelQueryWhereSort
@@ -1084,7 +1093,69 @@ extension NoteModelQueryObject
     on QueryBuilder<NoteModel, NoteModel, QFilterCondition> {}
 
 extension NoteModelQueryLinks
-    on QueryBuilder<NoteModel, NoteModel, QFilterCondition> {}
+    on QueryBuilder<NoteModel, NoteModel, QFilterCondition> {
+  QueryBuilder<NoteModel, NoteModel, QAfterFilterCondition> audioAttachments(
+      FilterQuery<AudioAttachmentModel> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'audioAttachments');
+    });
+  }
+
+  QueryBuilder<NoteModel, NoteModel, QAfterFilterCondition>
+      audioAttachmentsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'audioAttachments', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<NoteModel, NoteModel, QAfterFilterCondition>
+      audioAttachmentsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'audioAttachments', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<NoteModel, NoteModel, QAfterFilterCondition>
+      audioAttachmentsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'audioAttachments', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<NoteModel, NoteModel, QAfterFilterCondition>
+      audioAttachmentsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'audioAttachments', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<NoteModel, NoteModel, QAfterFilterCondition>
+      audioAttachmentsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'audioAttachments', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<NoteModel, NoteModel, QAfterFilterCondition>
+      audioAttachmentsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'audioAttachments', lower, includeLower, upper, includeUpper);
+    });
+  }
+}
 
 extension NoteModelQuerySortBy on QueryBuilder<NoteModel, NoteModel, QSortBy> {
   QueryBuilder<NoteModel, NoteModel, QAfterSortBy> sortByContent() {

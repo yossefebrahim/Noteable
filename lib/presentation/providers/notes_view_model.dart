@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:noteable_app/domain/entities/audio_attachment.dart';
 import 'package:noteable_app/domain/entities/folder_entity.dart';
 import 'package:noteable_app/domain/entities/note_entity.dart';
 import 'package:noteable_app/domain/usecases/feature_usecases.dart';
@@ -41,6 +42,20 @@ class NotesViewModel extends ChangeNotifier {
   List<NoteEntity> get notes => _notes;
   List<FolderEntity> get folders => _folders;
   bool get isLoading => _isLoading;
+
+  /// Notes that have at least one audio attachment
+  List<NoteEntity> get notesWithAudio => _notes
+      .where((note) => note.audioAttachments.isNotEmpty)
+      .toList();
+
+  /// Notes that do not have any audio attachments
+  List<NoteEntity> get notesWithoutAudio => _notes
+      .where((note) => note.audioAttachments.isEmpty)
+      .toList();
+
+  /// Total number of audio attachments across all notes
+  int get totalAudioAttachments => _notes
+      .fold<int>(0, (sum, note) => sum + note.audioAttachments.length);
 
   Future<void> load() async {
     _isLoading = true;
@@ -113,4 +128,16 @@ class NotesViewModel extends ChangeNotifier {
   }
 
   Future<List<NoteEntity>> search(String query) => _searchNotes(query);
+
+  /// Check if a specific note has audio attachments
+  bool noteHasAudio(String noteId) {
+    final note = _notes.where((n) => n.id == noteId).firstOrNull;
+    return note?.audioAttachments.isNotEmpty ?? false;
+  }
+
+  /// Get audio attachments for a specific note
+  List<AudioAttachment> getAudioAttachmentsForNote(String noteId) {
+    final note = _notes.where((n) => n.id == noteId).firstOrNull;
+    return note?.audioAttachments ?? [];
+  }
 }

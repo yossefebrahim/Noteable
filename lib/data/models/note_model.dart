@@ -1,5 +1,7 @@
 import 'package:isar/isar.dart';
 
+import 'audio_attachment_model.dart';
+
 part 'note_model.g.dart';
 
 @collection
@@ -29,4 +31,6 @@ class NoteModel {
 
   @Index()
   String? folderId;
+
+  final audioAttachments = IsarLinks<AudioAttachmentModel>();
 }

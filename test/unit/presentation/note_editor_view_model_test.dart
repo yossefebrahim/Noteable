@@ -3,16 +3,47 @@ import 'package:noteable_app/data/repositories/in_memory_notes_feature_repositor
 import 'package:noteable_app/domain/usecases/feature_usecases.dart';
 import 'package:noteable_app/presentation/providers/note_detail_view_model.dart';
 
+import 'package:noteable_app/domain/entities/audio_attachment.dart';
+import 'package:noteable_app/domain/repositories/audio_repository.dart';
+
+class FakeAudioRepository implements AudioRepository {
+  @override
+  Future<void> initialize() async {}
+
+  @override
+  Future<List<AudioAttachment>> getAudioAttachments() async => [];
+
+  @override
+  Future<AudioAttachment?> getAudioAttachmentById(String id) async => null;
+
+  @override
+  Future<List<AudioAttachment>> getAudioAttachmentsByNoteId(String noteId) async => [];
+
+  @override
+  Future<AudioAttachment> createAudioAttachment(AudioAttachment audioAttachment) async =>
+      audioAttachment;
+
+  @override
+  Future<AudioAttachment> updateAudioAttachment(AudioAttachment audioAttachment) async =>
+      audioAttachment;
+
+  @override
+  Future<void> deleteAudioAttachment(String id) async {}
+}
+
 void main() {
   late InMemoryNotesFeatureRepository repo;
+  late FakeAudioRepository audioRepo;
   late NoteEditorViewModel vm;
 
   setUp(() {
     repo = InMemoryNotesFeatureRepository();
+    audioRepo = FakeAudioRepository();
     vm = NoteEditorViewModel(
       createNote: CreateNoteUseCase(repo),
       updateNote: UpdateNoteUseCase(repo),
       getNotes: GetNotesUseCase(repo),
+      audioRepository: audioRepo,
     );
   });
 

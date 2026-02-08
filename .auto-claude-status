@@ -1,15 +1,15 @@
 {
   "active": true,
-  "spec": "007-note-export-sharing",
+  "spec": "003-voice-notes-audio-recording",
   "state": "building",
   "subtasks": {
-    "completed": 22,
-    "total": 25,
-    "in_progress": 1,
+    "completed": 45,
+    "total": 46,
+    "in_progress": 0,
     "failed": 0
   },
   "phase": {
-    "current": "Integration and Testing",
+    "current": "Integration and End-to-End Testing",
     "id": null,
     "total": 5
   },
@@ -18,8 +18,8 @@
     "max": 1
   },
   "session": {
-    "number": 26,
-    "started_at": "2026-02-08T01:21:24.995924"
+    "number": 6,
+    "started_at": "2026-02-08T02:59:34.664660"
   },
-  "last_update": "2026-02-08T02:54:25.218062"
+  "last_update": "2026-02-08T03:25:00.000000"
 }

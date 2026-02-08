@@ -1,7 +1,9 @@
+import 'package:noteable_app/domain/entities/audio_attachment.dart';
 import 'package:noteable_app/domain/entities/note.dart';
 import 'package:noteable_app/domain/repositories/note_repository.dart';
 
 import '../../services/storage/isar_service.dart';
+import '../models/audio_attachment_model.dart';
 import '../models/deleted_note_model.dart';
 import '../models/note_model.dart';
 import '../services/export_service.dart';
@@ -21,7 +23,7 @@ class NoteRepositoryImpl implements NoteRepository {
     final model = _toModel(note);
     final id = await _isarService.putNote(model);
     final created = await _isarService.getNoteById(id);
-    return _toEntity(created!);
+    return await _toEntity(created!);
   }
 
   @override
@@ -33,19 +35,34 @@ class NoteRepositoryImpl implements NoteRepository {
   Future<Note?> getNoteById(String id) async {
     final model = await _isarService.getNoteById(int.parse(id));
     if (model == null) return null;
-    return _toEntity(model);
+    return await _toEntity(model);
   }
 
   @override
   Future<List<Note>> getNoteList() async {
     final notes = await _isarService.getNotes();
-    return notes.map(_toEntity).toList(growable: false);
+    return await Future.wait(notes.map(_toEntity));
   }
 
   @override
   Future<List<Note>> searchNotes(String query) async {
     final notes = await _isarService.searchNotes(query);
-    return notes.map(_toEntity).toList(growable: false);
+    return await Future.wait(notes.map(_toEntity));
+  }
+
+  @override
+  Future<List<Note>> getNotesWithAudioAttachments() async {
+    final allNotes = await _isarService.getNotes();
+    final notesWithAudio = <Note>[];
+
+    for (final model in allNotes) {
+      await model.audioAttachments.load();
+      if (model.audioAttachments.isNotEmpty) {
+        notesWithAudio.add(await _toEntity(model));
+      }
+    }
+
+    return notesWithAudio;
   }
 
   @override
@@ -59,6 +76,7 @@ class NoteRepositoryImpl implements NoteRepository {
       content: note.content,
       isPinned: !note.isPinned,
       folderId: note.folderId,
+      audioAttachments: note.audioAttachments,
       createdAt: note.createdAt,
       updatedAt: DateTime.now(),
     );
@@ -71,7 +89,7 @@ class NoteRepositoryImpl implements NoteRepository {
     final model = _toModel(note);
     await _isarService.putNote(model);
     final updated = await _isarService.getNoteById(model.id);
-    return _toEntity(updated!);
+    return await _toEntity(updated!);
   }
 
   @override
@@ -159,7 +177,7 @@ class NoteRepositoryImpl implements NoteRepository {
     }
 
     final note = await _isarService.getNoteById(noteId);
-    return _toEntity(note!);
+    return await _toEntity(note!);
   }
 
   @override
@@ -190,15 +208,37 @@ class NoteRepositoryImpl implements NoteRepository {
     folderId: note.folderId,
   );
 
-  Note _toEntity(NoteModel model) => Note(
-    id: model.id.toString(),
-    title: model.title,
-    content: model.content,
-    isPinned: model.isPinned,
-    folderId: model.folderId,
-    createdAt: model.createdAt,
-    updatedAt: model.updatedAt ?? model.createdAt,
-  );
+  Future<Note> _toEntity(NoteModel model) async {
+    // Load audio attachments
+    await model.audioAttachments.load();
+    final attachmentModels = model.audioAttachments.toList();
+
+    // Convert audio attachment models to entities
+    final attachments = attachmentModels
+        .map((attachmentModel) {
+          return AudioAttachment(
+            id: attachmentModel.id.toString(),
+            duration: attachmentModel.duration,
+            path: attachmentModel.path,
+            format: attachmentModel.format,
+            size: attachmentModel.size,
+            createdAt: attachmentModel.createdAt,
+            noteId: attachmentModel.noteId,
+          );
+        })
+        .toList(growable: false);
+
+    return Note(
+      id: model.id.toString(),
+      title: model.title,
+      content: model.content,
+      isPinned: model.isPinned,
+      folderId: model.folderId,
+      audioAttachments: attachments,
+      createdAt: model.createdAt,
+      updatedAt: model.updatedAt ?? model.createdAt,
+    );
+  }
 
   ExportFormat _parseExportFormat(String format) {
     switch (format.toLowerCase()) {

@@ -19,7 +19,7 @@ class DeletedNoteModel {
   Id id;
 
   @Index()
-  late Id noteId;
+  late int noteId;
 
   late String title;
 

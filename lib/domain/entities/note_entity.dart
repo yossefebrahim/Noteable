@@ -1,3 +1,5 @@
+import 'audio_attachment.dart';
+
 class NoteEntity {
   NoteEntity({
     required this.id,
@@ -5,6 +7,7 @@ class NoteEntity {
     required this.content,
     this.isPinned = false,
     this.folderId,
+    this.audioAttachments = const [],
     DateTime? createdAt,
     DateTime? updatedAt,
   })  : createdAt = createdAt ?? DateTime.now(),
@@ -15,6 +18,7 @@ class NoteEntity {
   final String content;
   final bool isPinned;
   final String? folderId;
+  final List<AudioAttachment> audioAttachments;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -25,6 +29,7 @@ class NoteEntity {
     bool? isPinned,
     String? folderId,
     bool clearFolderId = false,
+    List<AudioAttachment>? audioAttachments,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -34,6 +39,7 @@ class NoteEntity {
       content: content ?? this.content,
       isPinned: isPinned ?? this.isPinned,
       folderId: clearFolderId ? null : (folderId ?? this.folderId),
+      audioAttachments: audioAttachments ?? this.audioAttachments,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

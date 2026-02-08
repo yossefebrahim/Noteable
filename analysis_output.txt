@@ -1,0 +1,11 @@
+Analyzing 003-voice-notes-audio-recording...                    
+
+   info • 'partialResults' is deprecated and shouldn't be used. Use SpeechListenOptions.partialResults instead • lib/services/audio/transcription_service.dart:101:9 • deprecated_member_use
+   info • 'cancelOnError' is deprecated and shouldn't be used. Use SpeechListenOptions.cancelOnError instead • lib/services/audio/transcription_service.dart:105:9 • deprecated_member_use
+   info • 'listenMode' is deprecated and shouldn't be used. Use SpeechListenOptions.listenMode instead • lib/services/audio/transcription_service.dart:106:9 • deprecated_member_use
+   info • Don't invoke 'print' in production code • test/perf/performance_tracker.dart:210:5 • avoid_print
+   info • Unnecessary use of multiple underscores • test/perf/scroll_perf_test.dart:45:46 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/widget/screens/home_screen_test.dart:30:68 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/widget/screens/search_screen_test.dart:33:48 • unnecessary_underscores
+
+7 issues found. (ran in 1.7s)

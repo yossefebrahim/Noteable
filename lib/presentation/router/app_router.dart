@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../services/di/service_locator.dart';
 import '../providers/note_detail_view_model.dart';
+import '../screens/audio_recording/audio_recording_screen.dart';
 import '../screens/folders/folders_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/note_detail/note_detail_screen.dart';
@@ -59,6 +60,13 @@ class AppRouter {
         path: '/search',
         pageBuilder: (BuildContext context, GoRouterState state) =>
             _animatedPage(state: state, child: const SearchScreen()),
+      ),
+      GoRoute(
+        path: '/audio-recording',
+        pageBuilder: (BuildContext context, GoRouterState state) => _animatedPage(
+          state: state,
+          child: AudioRecordingScreen(noteId: state.extra as String?),
+        ),
       ),
       GoRoute(
         path: '/settings',
