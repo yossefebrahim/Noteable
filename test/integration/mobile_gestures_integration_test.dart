@@ -30,10 +30,9 @@ void main() {
         searchNotes: SearchNotesUseCase(repo),
       );
       editorVm = NoteEditorViewModel(
-        getNote: GetNoteUseCase(repo),
         createNote: CreateNoteUseCase(repo),
         updateNote: UpdateNoteUseCase(repo),
-        deleteNote: DeleteNoteUseCase(repo),
+        getNotes: GetNotesUseCase(repo),
       );
       await notesVm.load();
     });
@@ -300,8 +299,9 @@ void main() {
 
     testWidgets('Contextual menu shows correct pin state', (tester) async {
       // Create one pinned and one unpinned note
-      await repo.createNote(title: 'Pinned Note', content: 'Content', isPinned: true);
-      await repo.createNote(title: 'Unpinned Note', content: 'Content', isPinned: false);
+      final pinnedNote = await repo.createNote(title: 'Pinned Note', content: 'Content');
+      await repo.createNote(title: 'Unpinned Note', content: 'Content');
+      await repo.togglePin(pinnedNote.id); // Pin the first note
       await notesVm.load();
 
       await tester.pumpWidget(_buildApp());

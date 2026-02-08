@@ -10,6 +10,7 @@ import 'package:noteable_app/presentation/screens/home/home_screen.dart';
 import 'package:noteable_app/presentation/screens/note_detail/note_detail_screen.dart';
 import 'package:noteable_app/presentation/screens/search/search_screen.dart';
 import 'package:noteable_app/presentation/screens/shortcuts_help/shortcuts_help_screen.dart';
+import 'package:noteable_app/presentation/widgets/app_text_field.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -34,10 +35,9 @@ void main() {
         searchNotes: SearchNotesUseCase(repo),
       );
       editorVm = NoteEditorViewModel(
-        getNote: GetNoteUseCase(repo),
         createNote: CreateNoteUseCase(repo),
         updateNote: UpdateNoteUseCase(repo),
-        deleteNote: DeleteNoteUseCase(repo),
+        getNotes: GetNotesUseCase(repo),
       );
       await notesVm.load();
     });

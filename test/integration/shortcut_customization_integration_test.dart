@@ -44,10 +44,9 @@ void main() {
         searchNotes: SearchNotesUseCase(repo),
       );
       editorVm = NoteEditorViewModel(
-        getNote: GetNoteUseCase(repo),
         createNote: CreateNoteUseCase(repo),
         updateNote: UpdateNoteUseCase(repo),
-        deleteNote: DeleteNoteUseCase(repo),
+        getNotes: GetNotesUseCase(repo),
       );
       await notesVm.load();
     });
