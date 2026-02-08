@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:noteable_app/domain/entities/note_entity.dart';
+import 'package:noteable_app/domain/entities/template_entity.dart';
 import 'package:noteable_app/domain/usecases/feature_usecases.dart';
+import 'package:noteable_app/domain/usecases/template/apply_template_usecase.dart';
 
 class NoteEditorViewModel extends ChangeNotifier {
   NoteEditorViewModel({
@@ -56,6 +58,20 @@ class NoteEditorViewModel extends ChangeNotifier {
     _note = await _updateNote(_note!);
     _isSaving = false;
     notifyListeners();
+  }
+
+  /// Applies a template to the current note by substituting variables
+  /// and updating the note's title and content.
+  Future<void> applyTemplate(TemplateEntity template) async {
+    if (_note == null) return;
+
+    final applyTemplate = ApplyTemplateUseCase(template: template);
+    final result = applyTemplate();
+
+    if (result.isSuccess && result.data != null) {
+      final applied = result.data!;
+      updateDraft(title: applied.title, content: applied.content);
+    }
   }
 
   @override
