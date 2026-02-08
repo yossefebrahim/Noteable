@@ -87,14 +87,14 @@ class IsarService {
     final audioAttachmentIds = transcriptions.map((t) => t.audioAttachmentId).nonNulls.toSet();
     final audioAttachments = await database.audioAttachmentModels
         .filter()
-        .anyOf(audioAttachmentIds.toList(), (q) => q.idEqualTo(q))
+        .anyOf(audioAttachmentIds.toList(), (q, Id id) => q.idEqualTo(id))
         .findAll();
 
     // Get notes for matching audio attachments
     final noteIds = audioAttachments.map((a) => a.noteId).nonNulls.map(int.parse).toSet();
     final notesByTranscription = await database.noteModels
         .filter()
-        .anyOf(noteIds.toList(), (q) => q.idEqualTo(q))
+        .anyOf(noteIds.toList(), (q, int id) => q.idEqualTo(id))
         .findAll();
 
     // Combine and deduplicate results
@@ -231,8 +231,9 @@ class IsarService {
 
   Future<bool> permanentlyDeleteNote(Id noteId) async {
     final database = await db;
-    return database.writeTxn(() {
-      return database.deletedNoteModels.filter().noteIdEqualTo(noteId).deleteAll() > 0;
+    return database.writeTxn(() async {
+      final count = await database.deletedNoteModels.filter().noteIdEqualTo(noteId).deleteAll();
+      return count > 0;
     });
   }
 }

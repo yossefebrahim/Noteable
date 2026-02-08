@@ -11,8 +11,7 @@ class PerformanceTracker {
   /// Creates a new performance tracker.
   ///
   /// [baselineData] is optional baseline metrics loaded from a baselines file.
-  PerformanceTracker({Map<String, dynamic>? baselineData})
-      : _baselines = baselineData ?? {};
+  PerformanceTracker({Map<String, dynamic>? baselineData}) : _baselines = baselineData ?? {};
 
   final Map<String, dynamic> _baselines;
   final List<BenchmarkResult> _results = [];
@@ -29,18 +28,15 @@ class PerformanceTracker {
   }
 
   /// Records a benchmark with specified parameters.
-  void record({
-    required String name,
-    required int valueMs,
-    int? thresholdMs,
-    int? baselineMs,
-  }) {
-    recordResult(BenchmarkResult(
-      name: name,
-      valueMs: valueMs,
-      thresholdMs: thresholdMs,
-      baselineMs: baselineMs,
-    ));
+  void record({required String name, required int valueMs, int? thresholdMs, int? baselineMs}) {
+    recordResult(
+      BenchmarkResult(
+        name: name,
+        valueMs: valueMs,
+        thresholdMs: thresholdMs,
+        baselineMs: baselineMs,
+      ),
+    );
   }
 
   /// Gets the baseline value for a metric name.
@@ -59,12 +55,10 @@ class PerformanceTracker {
   bool get allPassed => _results.every((r) => r.passesThreshold);
 
   /// Checks if any metrics failed their baseline comparison.
-  bool get hasBaselineFailures =>
-      _results.any((r) => !r.passesBaseline && r.baselineMs != null);
+  bool get hasBaselineFailures => _results.any((r) => !r.passesBaseline && r.baselineMs != null);
 
   /// Gets the list of failed results.
-  List<BenchmarkResult> get failedResults =>
-      _results.where((r) => !r.passesThreshold).toList();
+  List<BenchmarkResult> get failedResults => _results.where((r) => !r.passesThreshold).toList();
 
   /// Gets the list of results that regressed from baseline.
   List<BenchmarkResult> get regressedResults =>
@@ -186,8 +180,8 @@ class PerformanceTracker {
     final summary = allPassed && !hasBaselineFailures
         ? '✅ All ${_results.length} performance benchmarks passed'
         : hasBaselineFailures
-            ? '⚠️ Performance regressions detected'
-            : '❌ Some performance benchmarks failed';
+        ? '⚠️ Performance regressions detected'
+        : '❌ Some performance benchmarks failed';
 
     buffer.writeln('::notice title=Performance Test Summary::$summary');
 
@@ -332,12 +326,7 @@ extension PerformanceTracking on WidgetTester {
   }) async {
     final elapsed = await BenchmarkHelper.recordTime(operation);
 
-    tracker?.record(
-      name: name,
-      valueMs: elapsed,
-      thresholdMs: thresholdMs,
-      baselineMs: baselineMs,
-    );
+    tracker?.record(name: name, valueMs: elapsed, thresholdMs: thresholdMs, baselineMs: baselineMs);
 
     return elapsed;
   }
@@ -354,11 +343,7 @@ void main() {
 
     test('records benchmark results', () {
       final tracker = PerformanceTracker();
-      tracker.record(
-        name: 'test_metric',
-        valueMs: 100,
-        thresholdMs: 200,
-      );
+      tracker.record(name: 'test_metric', valueMs: 100, thresholdMs: 200);
 
       expect(tracker.resultCount, 1);
       expect(tracker.allPassed, isTrue);
@@ -366,11 +351,7 @@ void main() {
 
     test('detects failed benchmarks', () {
       final tracker = PerformanceTracker();
-      tracker.record(
-        name: 'slow_metric',
-        valueMs: 300,
-        thresholdMs: 200,
-      );
+      tracker.record(name: 'slow_metric', valueMs: 300, thresholdMs: 200);
 
       expect(tracker.allPassed, isFalse);
       expect(tracker.failedResults.length, 1);
@@ -379,11 +360,7 @@ void main() {
 
     test('detects regressions from baseline', () {
       final tracker = PerformanceTracker();
-      tracker.record(
-        name: 'regressed_metric',
-        valueMs: 300,
-        baselineMs: 200,
-      );
+      tracker.record(name: 'regressed_metric', valueMs: 300, baselineMs: 200);
 
       expect(tracker.hasBaselineFailures, isTrue);
       expect(tracker.regressedResults.length, 1);
@@ -391,11 +368,7 @@ void main() {
 
     test('tracks improvements from baseline', () {
       final tracker = PerformanceTracker();
-      tracker.record(
-        name: 'improved_metric',
-        valueMs: 150,
-        baselineMs: 200,
-      );
+      tracker.record(name: 'improved_metric', valueMs: 150, baselineMs: 200);
 
       expect(tracker.hasBaselineFailures, isFalse);
     });
@@ -412,12 +385,7 @@ void main() {
 
     test('generates valid JSON output', () {
       final tracker = PerformanceTracker();
-      tracker.record(
-        name: 'test_metric',
-        valueMs: 100,
-        thresholdMs: 200,
-        baselineMs: 150,
-      );
+      tracker.record(name: 'test_metric', valueMs: 100, thresholdMs: 200, baselineMs: 150);
       tracker.addMetadata('test_key', 'test_value');
 
       final json = tracker.toJson();
@@ -430,11 +398,7 @@ void main() {
 
     test('generates summary text', () {
       final tracker = PerformanceTracker();
-      tracker.record(
-        name: 'test_metric',
-        valueMs: 100,
-        thresholdMs: 200,
-      );
+      tracker.record(name: 'test_metric', valueMs: 100, thresholdMs: 200);
 
       final summary = tracker.generateSummary();
 
@@ -446,16 +410,8 @@ void main() {
 
     test('generates GitHub Actions annotations', () {
       final tracker = PerformanceTracker();
-      tracker.record(
-        name: 'good_metric',
-        valueMs: 100,
-        thresholdMs: 200,
-      );
-      tracker.record(
-        name: 'bad_metric',
-        valueMs: 300,
-        thresholdMs: 200,
-      );
+      tracker.record(name: 'good_metric', valueMs: 100, thresholdMs: 200);
+      tracker.record(name: 'bad_metric', valueMs: 300, thresholdMs: 200);
 
       final annotations = tracker.generateGitHubAnnotations();
 
@@ -466,25 +422,14 @@ void main() {
 
     test('assertAllPassed throws when benchmarks fail', () {
       final tracker = PerformanceTracker();
-      tracker.record(
-        name: 'slow_metric',
-        valueMs: 300,
-        thresholdMs: 200,
-      );
+      tracker.record(name: 'slow_metric', valueMs: 300, thresholdMs: 200);
 
-      expect(
-        () => tracker.assertAllPassed(),
-        throwsA(isA<TestFailure>()),
-      );
+      expect(() => tracker.assertAllPassed(), throwsA(isA<TestFailure>()));
     });
 
     test('assertAllPassed does not throw when all pass', () {
       final tracker = PerformanceTracker();
-      tracker.record(
-        name: 'fast_metric',
-        valueMs: 100,
-        thresholdMs: 200,
-      );
+      tracker.record(name: 'fast_metric', valueMs: 100, thresholdMs: 200);
 
       expect(() => tracker.assertAllPassed(), returnsNormally);
     });
@@ -511,15 +456,14 @@ void main() {
         baselineMs: 200,
       );
 
-      expect(
-        () => tracker.assertNoRegressions(regressionThreshold: 0.2),
-        returnsNormally,
-      );
+      expect(() => tracker.assertNoRegressions(regressionThreshold: 0.2), returnsNormally);
     });
 
     test('gets baseline from loaded data', () {
       final tracker = PerformanceTracker(
-        baselineData: {'test_metric': {'value_ms': 150}},
+        baselineData: {
+          'test_metric': {'value_ms': 150},
+        },
       );
 
       expect(tracker.getBaseline('test_metric'), 150);
@@ -558,9 +502,7 @@ void main() {
     });
 
     test('handles baseline with direct integer values', () {
-      final tracker = PerformanceTracker(
-        baselineData: {'metric': 100},
-      );
+      final tracker = PerformanceTracker(baselineData: {'metric': 100});
 
       expect(tracker.getBaseline('metric'), 100);
     });
@@ -575,114 +517,21 @@ void main() {
 
   group('BenchmarkResult', () {
     test('calculates passesThreshold correctly', () {
-      const result1 = BenchmarkResult(
-        name: 'test',
-        valueMs: 100,
-        thresholdMs: 200,
-      );
+      const result1 = BenchmarkResult(name: 'test', valueMs: 100, thresholdMs: 200);
       expect(result1.passesThreshold, isTrue);
 
-      const result2 = BenchmarkResult(
-        name: 'test',
-        valueMs: 300,
-        thresholdMs: 200,
-      );
+      const result2 = BenchmarkResult(name: 'test', valueMs: 300, thresholdMs: 200);
       expect(result2.passesThreshold, isFalse);
 
-      const result3 = BenchmarkResult(
-        name: 'test',
-        valueMs: 100,
-      );
+      const result3 = BenchmarkResult(name: 'test', valueMs: 100);
       expect(result3.passesThreshold, isTrue); // No threshold = passes
     });
 
     test('calculates passesBaseline correctly', () {
-      const result1 = BenchmarkResult(
-        name: 'test',
-        valueMs: 150,
-        baselineMs: 200,
-      );
+      const result1 = BenchmarkResult(name: 'test', valueMs: 150, baselineMs: 200);
       expect(result1.passesBaseline, isTrue);
 
-      const result2 = BenchmarkResult(
-        name: 'test',
-        valueMs: 250,
-        baselineMs: 200,
-      );
-      expect(result2.passesBaseline, isFalse);
-    });
-
-    test('converts to JSON correctly', () {
-      const result = BenchmarkResult(
-        name: 'test_metric',
-        valueMs: 150,
-        thresholdMs: 200,
-        baselineMs: 100,
-      );
-
-      final json = result.toJson();
-
-      expect(json['name'], 'test_metric');
-      expect(json['value_ms'], 150);
-      expect(json['threshold_ms'], 200);
-      expect(json['baseline_ms'], 100);
-      expect(json['passes_threshold'], isTrue);
-      expect(json['passes_baseline'], isFalse);
-    });
-
-    test('toString includes all relevant data', () {
-      const result = BenchmarkResult(
-        name: 'test_metric',
-        valueMs: 150,
-        thresholdMs: 200,
-        baselineMs: 100,
-      );
-
-      final str = result.toString();
-
-      expect(str, contains('test_metric'));
-      expect(str, contains('150ms'));
-      expect(str, contains('threshold: 200ms'));
-      expect(str, contains('baseline: 100ms'));
-      expect(str, contains('+50')); // difference from baseline
-    });
-  });
-}
-    test('calculates passesThreshold correctly', () {
-      const result1 = BenchmarkResult(
-        name: 'test',
-        valueMs: 100,
-        thresholdMs: 200,
-      );
-      expect(result1.passesThreshold, isTrue);
-
-      const result2 = BenchmarkResult(
-        name: 'test',
-        valueMs: 300,
-        thresholdMs: 200,
-      );
-      expect(result2.passesThreshold, isFalse);
-
-      const result3 = BenchmarkResult(
-        name: 'test',
-        valueMs: 100,
-      );
-      expect(result3.passesThreshold, isTrue); // No threshold = passes
-    });
-
-    test('calculates passesBaseline correctly', () {
-      const result1 = BenchmarkResult(
-        name: 'test',
-        valueMs: 150,
-        baselineMs: 200,
-      );
-      expect(result1.passesBaseline, isTrue);
-
-      const result2 = BenchmarkResult(
-        name: 'test',
-        valueMs: 250,
-        baselineMs: 200,
-      );
+      const result2 = BenchmarkResult(name: 'test', valueMs: 250, baselineMs: 200);
       expect(result2.passesBaseline, isFalse);
     });
 

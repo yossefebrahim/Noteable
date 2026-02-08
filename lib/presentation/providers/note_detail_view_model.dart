@@ -35,7 +35,7 @@ class NoteEditorViewModel extends ChangeNotifier {
     final List<NoteEntity> notes = await _getNotes();
     _note = noteId == null
         ? await _createNote(folderId: folderId)
-        : notes.firstWhere((NoteEntity n) => n.id == noteId);
+        : notes.cast<NoteEntity?>().firstWhere((n) => n?.id == noteId, orElse: () => null);
     await _loadAudioAttachments();
     notifyListeners();
   }
@@ -62,23 +62,15 @@ class NoteEditorViewModel extends ChangeNotifier {
   Future<void> addAudioAttachment(AudioAttachment attachment) async {
     if (_note == null) return;
     final updatedAttachments = [..._note!.audioAttachments, attachment];
-    _note = _note!.copyWith(
-      audioAttachments: updatedAttachments,
-      updatedAt: DateTime.now(),
-    );
+    _note = _note!.copyWith(audioAttachments: updatedAttachments, updatedAt: DateTime.now());
     notifyListeners();
     _scheduleAutoSave();
   }
 
   Future<void> removeAudioAttachment(String attachmentId) async {
     if (_note == null) return;
-    final updatedAttachments = _note!.audioAttachments
-        .where((a) => a.id != attachmentId)
-        .toList();
-    _note = _note!.copyWith(
-      audioAttachments: updatedAttachments,
-      updatedAt: DateTime.now(),
-    );
+    final updatedAttachments = _note!.audioAttachments.where((a) => a.id != attachmentId).toList();
+    _note = _note!.copyWith(audioAttachments: updatedAttachments, updatedAt: DateTime.now());
     notifyListeners();
     _scheduleAutoSave();
   }

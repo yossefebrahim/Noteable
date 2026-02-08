@@ -13,14 +13,10 @@ class TranscriptionService {
   bool _isInitialized = false;
 
   // Stream controllers for state and results
-  final StreamController<bool> _isListeningController =
-      StreamController<bool>.broadcast();
-  final StreamController<String> _transcriptionController =
-      StreamController<String>.broadcast();
-  final StreamController<double> _confidenceController =
-      StreamController<double>.broadcast();
-  final StreamController<String> _statusController =
-      StreamController<String>.broadcast();
+  final StreamController<bool> _isListeningController = StreamController<bool>.broadcast();
+  final StreamController<String> _transcriptionController = StreamController<String>.broadcast();
+  final StreamController<double> _confidenceController = StreamController<double>.broadcast();
+  final StreamController<String> _statusController = StreamController<String>.broadcast();
 
   // Current transcription state
   bool _isListening = false;
@@ -40,7 +36,7 @@ class TranscriptionService {
   /// Check if speech recognition is available on the device
   Future<bool> isAvailable() async {
     await init();
-    return _speechToText.isAvailable();
+    return _speechToText.isAvailable;
   }
 
   /// Stream that emits true when listening, false when not
@@ -75,14 +71,11 @@ class TranscriptionService {
   /// [partialResults] determines whether to emit partial results during speech.
   ///
   /// Returns true if listening started successfully, false otherwise.
-  Future<bool> startListening({
-    String? localeId,
-    bool partialResults = true,
-  }) async {
+  Future<bool> startListening({String? localeId, bool partialResults = true}) async {
     await init();
 
     // Check if speech recognition is available
-    if (!await _speechToText.isAvailable()) {
+    if (!_speechToText.isAvailable) {
       return false;
     }
 

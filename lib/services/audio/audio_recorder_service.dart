@@ -13,10 +13,8 @@ class AudioRecorderService {
   bool _isInitialized = false;
 
   // Stream controllers for state and amplitude
-  final StreamController<bool> _isRecordingController =
-      StreamController<bool>.broadcast();
-  final StreamController<double> _amplitudeController =
-      StreamController<double>.broadcast();
+  final StreamController<bool> _isRecordingController = StreamController<bool>.broadcast();
+  final StreamController<double> _amplitudeController = StreamController<double>.broadcast();
 
   // Current recording state
   bool _isRecording = false;
@@ -89,11 +87,11 @@ class AudioRecorderService {
       // Start recording
       await _recorder.start(
         RecordConfig(
-          encoder: AudioEncoder.aacM4a, // Default to M4A format
+          encoder: AudioEncoder.aacLc, // Default to M4A format (AAC LC)
           bitRate: 128000, // 128 kbps
           sampleRate: 44100, // 44.1 kHz
         ),
-        path: path,
+        path: path!,
       );
 
       // Start amplitude monitoring
@@ -162,7 +160,7 @@ class AudioRecorderService {
 
       if (recordInfo != null) {
         return RecordingInfo(
-          path: recordInfo.path,
+          path: recordInfo,
           duration: _recordingDuration,
           format: 'm4a', // Default format
         );
@@ -220,11 +218,7 @@ class AudioRecorderService {
 
 /// Information about a completed recording
 class RecordingInfo {
-  const RecordingInfo({
-    required this.path,
-    required this.duration,
-    required this.format,
-  });
+  const RecordingInfo({required this.path, required this.duration, required this.format});
 
   /// Path to the recorded audio file
   final String path;

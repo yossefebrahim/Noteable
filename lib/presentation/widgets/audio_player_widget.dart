@@ -36,9 +36,7 @@ class AudioPlayerWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.3),
-        ),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.3)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -47,14 +45,8 @@ class AudioPlayerWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _DurationDisplay(
-                position: provider.position,
-                duration: provider.duration,
-              ),
-              if (onDelete != null)
-                _DeleteButton(
-                  onPressed: onDelete,
-                ),
+              _DurationDisplay(position: provider.position, duration: provider.duration),
+              if (onDelete != null) _DeleteButton(onPressed: onDelete!),
             ],
           ),
           const SizedBox(height: 16),
@@ -95,10 +87,7 @@ class AudioPlayerWidget extends StatelessWidget {
 
 /// Displays current position and total duration
 class _DurationDisplay extends StatelessWidget {
-  const _DurationDisplay({
-    required this.position,
-    required this.duration,
-  });
+  const _DurationDisplay({required this.position, required this.duration});
 
   final Duration position;
   final Duration? duration;
@@ -112,7 +101,7 @@ class _DurationDisplay extends StatelessWidget {
     return Text(
       '$positionText / $durationText',
       style: AppTextStyles.caption.copyWith(
-        color: theme.colorScheme.onSurface.withOpacity(0.7),
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
       ),
     );
   }
@@ -126,9 +115,7 @@ class _DurationDisplay extends StatelessWidget {
 
 /// Delete button for removing audio attachment
 class _DeleteButton extends StatelessWidget {
-  const _DeleteButton({
-    required this.onPressed,
-  });
+  const _DeleteButton({required this.onPressed});
 
   final VoidCallback onPressed;
 
@@ -141,14 +128,9 @@ class _DeleteButton extends StatelessWidget {
       opacity: 1.0,
       child: IconButton(
         onPressed: onPressed,
-        icon: Icon(
-          Icons.delete_outline,
-          color: theme.colorScheme.error,
-        ),
+        icon: Icon(Icons.delete_outline, color: theme.colorScheme.error),
         tooltip: 'Delete audio',
-        style: IconButton.styleFrom(
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
+        style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
       ),
     );
   }
@@ -198,11 +180,7 @@ class _WaveformSlider extends StatelessWidget {
 
 /// Simple progress bar for when waveform is not available
 class _ProgressBar extends StatelessWidget {
-  const _ProgressBar({
-    required this.position,
-    required this.duration,
-    required this.onSeek,
-  });
+  const _ProgressBar({required this.position, required this.duration, required this.onSeek});
 
   final Duration position;
   final Duration? duration;
@@ -226,7 +204,7 @@ class _ProgressBar extends StatelessWidget {
         value: progress.clamp(0.0, 1.0),
         onChanged: duration != null ? (value) => onSeek(value) : null,
         activeColor: theme.colorScheme.primary,
-        inactiveColor: theme.colorScheme.outline.withOpacity(0.3),
+        inactiveColor: theme.colorScheme.outline.withValues(alpha: 0.3),
       ),
     );
   }
@@ -254,18 +232,12 @@ class _PlaybackControls extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // Stop button
-        _ControlButton(
-          icon: Icons.stop,
-          onPressed: hasAudio ? onStopPressed : null,
-          size: 48,
-        ),
+        _ControlButton(icon: Icons.stop, onPressed: hasAudio ? onStopPressed : null, size: 48),
         const SizedBox(width: 16),
         // Play/Pause button
         _ControlButton(
           icon: isPlaying ? Icons.pause : Icons.play_arrow,
-          onPressed: hasAudio
-              ? (isPlaying ? onPausePressed : onPlayPressed)
-              : null,
+          onPressed: hasAudio ? (isPlaying ? onPausePressed : onPlayPressed) : null,
           size: 64,
           isPrimary: true,
         ),
@@ -315,10 +287,7 @@ class _ControlButton extends StatelessWidget {
             shape: const CircleBorder(),
             padding: EdgeInsets.zero,
           ),
-          child: Icon(
-            icon,
-            size: isPrimary ? 32 : 24,
-          ),
+          child: Icon(icon, size: isPrimary ? 32 : 24),
         ),
       ),
     );

@@ -78,7 +78,7 @@ class HomeScreen extends StatelessWidget {
                                 .then((_) => vm.refreshNotes()),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete_outline),
-                              onPressed: isLoading ? null : () => _confirmDelete(context, vm, note),
+                              onPressed: isLoading ? null : () => _deleteNote(context, vm, note),
                             ),
                           ),
                         );
@@ -92,37 +92,7 @@ class HomeScreen extends StatelessWidget {
             color: Colors.black26,
             child: const Center(child: CircularProgressIndicator()),
           ),
-          body: vm.notes.isEmpty
-              ? EmptyNotesState(
-                  onCreateTap: () => context.push('/note-detail').then((_) => vm.refreshNotes()),
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: vm.notes.length,
-                  separatorBuilder: (_, index) => const SizedBox(height: 12),
-                  itemBuilder: (BuildContext context, int index) {
-                    final NoteEntity note = vm.notes[index];
-                    return Card(
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        title: Text(note.title.isEmpty ? 'Untitled' : note.title),
-                        subtitle: Text(note.content.isEmpty ? 'Start writing…' : note.content, maxLines: 2, overflow: TextOverflow.ellipsis),
-                        leading: IconButton(
-                          tooltip: note.isPinned ? 'Unpin' : 'Pin',
-                          onPressed: () => vm.togglePin(note.id),
-                          icon: Icon(note.isPinned ? Icons.push_pin : Icons.push_pin_outlined),
-                        ),
-                        onTap: () => context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes()),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: () => _deleteNote(context, vm, note),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-        );
-      },
+      ],
     );
   }
 
@@ -138,10 +108,7 @@ class HomeScreen extends StatelessWidget {
       SnackBar(
         duration: const Duration(seconds: 4),
         content: Text('$noteTitle deleted'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () => vm.restoreNote(noteId),
-        ),
+        action: SnackBarAction(label: 'Undo', onPressed: () => vm.restoreNote(noteId)),
       ),
     );
   }

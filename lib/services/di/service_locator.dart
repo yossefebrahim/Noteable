@@ -4,6 +4,7 @@ import 'package:noteable_app/data/repositories/in_memory_notes_feature_repositor
 import 'package:noteable_app/data/repositories/transcription_repository_impl.dart';
 import 'package:noteable_app/domain/repositories/audio_repository.dart';
 import 'package:noteable_app/domain/repositories/transcription_repository.dart';
+import 'package:noteable_app/domain/repositories/notes_feature_repository.dart';
 import 'package:noteable_app/domain/usecases/audio/create_audio_attachment_usecase.dart';
 import 'package:noteable_app/domain/usecases/audio/transcribe_audio_usecase.dart';
 import 'package:noteable_app/domain/usecases/feature_usecases.dart';

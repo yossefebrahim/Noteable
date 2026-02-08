@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../domain/entities/audio_attachment.dart';
-import '../../providers/audio_player_provider.dart';
-import '../../providers/audio_recorder_provider.dart';
-import '../../providers/note_detail_view_model.dart';
-import '../../providers/notes_view_model.dart';
-import '../../widgets/app_button.dart';
-import '../../widgets/app_text_field.dart';
-import '../../widgets/audio_player_widget.dart';
-import '../../widgets/audio_recorder_widget.dart';
+import 'package:noteable_app/domain/entities/audio_attachment.dart';
+import 'package:noteable_app/presentation/providers/audio_player_provider.dart';
+import 'package:noteable_app/presentation/providers/audio_recorder_provider.dart';
+import 'package:noteable_app/presentation/providers/note_detail_view_model.dart';
+import 'package:noteable_app/presentation/providers/notes_view_model.dart';
+import 'package:noteable_app/presentation/widgets/app_button.dart';
+import 'package:noteable_app/presentation/widgets/app_text_field.dart';
+import 'package:noteable_app/presentation/widgets/audio_player_widget.dart';
+import 'package:noteable_app/presentation/widgets/audio_recorder_widget.dart';
 
 class NoteDetailScreen extends StatefulWidget {
   const NoteDetailScreen({super.key, this.noteId});
@@ -50,10 +50,18 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isEditing = context.select<NoteEditorViewModel, bool>((NoteEditorViewModel vm) => vm.hasNote);
-    final bool isPinned = context.select<NoteEditorViewModel, bool>((NoteEditorViewModel vm) => vm.note?.isPinned ?? false);
-    final bool isSaving = context.select<NoteEditorViewModel, bool>((NoteEditorViewModel vm) => vm.isSaving);
-    final audioAttachments = context.select<NoteEditorViewModel, List>((NoteEditorViewModel vm) => vm.audioAttachments);
+    final bool isEditing = context.select<NoteEditorViewModel, bool>(
+      (NoteEditorViewModel vm) => vm.hasNote,
+    );
+    final bool isPinned = context.select<NoteEditorViewModel, bool>(
+      (NoteEditorViewModel vm) => vm.note?.isPinned ?? false,
+    );
+    final bool isSaving = context.select<NoteEditorViewModel, bool>(
+      (NoteEditorViewModel vm) => vm.isSaving,
+    );
+    final audioAttachments = context.select<NoteEditorViewModel, List<AudioAttachment>>(
+      (NoteEditorViewModel vm) => vm.audioAttachments,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -94,7 +102,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             AppTextField(
               controller: _titleController,
               hintText: 'Note title',
-              onChanged: (String value) => context.read<NoteEditorViewModel>().updateDraft(title: value),
+              onChanged: (String value) =>
+                  context.read<NoteEditorViewModel>().updateDraft(title: value),
             ),
             const SizedBox(height: 12),
             AppTextField(
@@ -102,7 +111,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               hintText: 'Start writing...',
               maxLines: null,
               minLines: 10,
-              onChanged: (String value) => context.read<NoteEditorViewModel>().updateDraft(content: value),
+              onChanged: (String value) =>
+                  context.read<NoteEditorViewModel>().updateDraft(content: value),
             ),
             const SizedBox(height: 16),
             // Audio section
@@ -121,32 +131,25 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         if (audioAttachments.isNotEmpty) ...[
           Text(
             'Audio Attachments',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 12),
-          ...List<Widget>.generate(
-            audioAttachments.length,
-            (int index) {
-              final attachment = audioAttachments[index];
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _AudioPlayerTile(
-                  attachment: attachment,
-                  onDelete: () => _deleteAudioAttachment(attachment.id),
-                ),
-              );
-            },
-          ),
+          ...List<Widget>.generate(audioAttachments.length, (int index) {
+            final attachment = audioAttachments[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _AudioPlayerTile(
+                attachment: attachment,
+                onDelete: () => _deleteAudioAttachment(attachment.id),
+              ),
+            );
+          }),
           const SizedBox(height: 16),
         ],
         // Audio recorder widget
         Text(
           'Record Audio',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
         Consumer<AudioRecorderProvider>(
@@ -164,10 +167,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 }
 
 class _AudioPlayerTile extends StatefulWidget {
-  const _AudioPlayerTile({
-    required this.attachment,
-    this.onDelete,
-  });
+  const _AudioPlayerTile({required this.attachment, this.onDelete});
 
   final AudioAttachment attachment;
   final VoidCallback? onDelete;
