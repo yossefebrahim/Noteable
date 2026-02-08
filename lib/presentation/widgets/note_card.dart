@@ -37,6 +37,10 @@ class _NoteCardState extends State<NoteCard> {
                 Row(
                   children: [
                     Expanded(child: Text(widget.note.title, style: textTheme.titleMedium)),
+                    if (widget.note.audioAttachmentCount > 0) ...[
+                      Icon(Icons.mic, size: 16, color: Theme.of(context).colorScheme.primary),
+                      const SizedBox(width: 4),
+                    ],
                     IconButton(
                       onPressed: widget.onPinTap,
                       icon: Icon(
