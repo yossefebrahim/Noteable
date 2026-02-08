@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -295,28 +296,26 @@ class ExportService {
     }
   }
 
-  /// Save content to file (placeholder - actual file I/O will be added later)
+  /// Save content to file
   Future<String> _saveToFile(
     String fileName,
     _ExportContent content,
     ExportFormat format,
   ) async {
-    // File I/O will be implemented when integrating with repository
-    // For now, return a placeholder path
-    // The actual implementation will use path_provider and File:
-    //
-    // final directory = await getApplicationDocumentsDirectory();
-    // final file = File('${directory.path}/$fileName');
-    //
-    // if (content.isBinary) {
-    //   await file.writeAsBytes(content.bytes!);
-    // } else {
-    //   await file.writeAsString(content.text!);
-    // }
-    //
-    // return file.path;
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/$fileName');
 
-    return '/path/to/$fileName';
+      if (content.isBinary) {
+        await file.writeAsBytes(content.bytes!);
+      } else {
+        await file.writeAsString(content.text!);
+      }
+
+      return file.path;
+    } catch (e) {
+      throw Exception('Failed to save file: $e');
+    }
   }
 
   /// Generate a unique filename to avoid conflicts in ZIP archive
@@ -370,19 +369,16 @@ class ExportService {
   ///
   /// Saves the ZIP archive to disk:
   /// - Uses path_provider for app directory
-  //  - Writes binary ZIP data
+  /// - Writes binary ZIP data
   /// - Returns the full file path
   Future<String> _saveZipFile(String fileName, Uint8List zipBytes) async {
-    // File I/O will be implemented when integrating with repository
-    // For now, return a placeholder path
-    // The actual implementation will use path_provider and File:
-    //
-    // final directory = await getApplicationDocumentsDirectory();
-    // final file = File('${directory.path}/$fileName');
-    // await file.writeAsBytes(zipBytes);
-    //
-    // return file.path;
-
-    return '/path/to/$fileName';
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/$fileName');
+      await file.writeAsBytes(zipBytes);
+      return file.path;
+    } catch (e) {
+      throw Exception('Failed to save ZIP file: $e');
+    }
   }
 }
