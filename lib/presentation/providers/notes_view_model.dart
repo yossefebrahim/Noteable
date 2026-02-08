@@ -13,6 +13,7 @@ class NotesViewModel extends ChangeNotifier {
     required RenameFolderUseCase renameFolder,
     required DeleteFolderUseCase deleteFolder,
     required SearchNotesUseCase searchNotes,
+    required RestoreNoteUseCase restoreNote,
   }) : _getNotes = getNotes,
        _deleteNote = deleteNote,
        _togglePin = togglePin,
@@ -20,7 +21,8 @@ class NotesViewModel extends ChangeNotifier {
        _createFolder = createFolder,
        _renameFolder = renameFolder,
        _deleteFolder = deleteFolder,
-       _searchNotes = searchNotes;
+       _searchNotes = searchNotes,
+       _restoreNote = restoreNote;
 
   final GetNotesUseCase _getNotes;
   final DeleteNoteUseCase _deleteNote;
@@ -30,52 +32,84 @@ class NotesViewModel extends ChangeNotifier {
   final RenameFolderUseCase _renameFolder;
   final DeleteFolderUseCase _deleteFolder;
   final SearchNotesUseCase _searchNotes;
+  final RestoreNoteUseCase _restoreNote;
 
   List<NoteEntity> _notes = <NoteEntity>[];
   List<FolderEntity> _folders = <FolderEntity>[];
+  bool _isLoading = false;
 
   List<NoteEntity> get notes => _notes;
   List<FolderEntity> get folders => _folders;
+  bool get isLoading => _isLoading;
 
   Future<void> load() async {
+    _isLoading = true;
+    notifyListeners();
     _notes = await _getNotes();
     _folders = await _getFolders();
+    _isLoading = false;
     notifyListeners();
   }
 
   Future<void> refreshNotes() async {
+    _isLoading = true;
+    notifyListeners();
     _notes = await _getNotes();
+    _isLoading = false;
     notifyListeners();
   }
 
   Future<void> deleteNote(String id) async {
+    _isLoading = true;
+    notifyListeners();
     await _deleteNote(id);
-    await refreshNotes();
+    _notes = await _getNotes();
+    _isLoading = false;
+    notifyListeners();
   }
 
   Future<void> togglePin(String id) async {
+    _isLoading = true;
+    notifyListeners();
     await _togglePin(id);
+    _notes = await _getNotes();
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> restoreNote(String id) async {
+    await _restoreNote(id);
     await refreshNotes();
   }
 
   Future<void> createFolder(String name) async {
     if (name.trim().isEmpty) return;
+    _isLoading = true;
+    notifyListeners();
     await _createFolder(name.trim());
     _folders = await _getFolders();
+    _isLoading = false;
     notifyListeners();
   }
 
   Future<void> renameFolder(String id, String name) async {
     if (name.trim().isEmpty) return;
+    _isLoading = true;
+    notifyListeners();
     await _renameFolder(id, name.trim());
     _folders = await _getFolders();
+    _isLoading = false;
     notifyListeners();
   }
 
   Future<void> deleteFolder(String id) async {
+    _isLoading = true;
+    notifyListeners();
     await _deleteFolder(id);
     _folders = await _getFolders();
-    await refreshNotes();
+    _notes = await _getNotes();
+    _isLoading = false;
+    notifyListeners();
   }
 
   Future<List<NoteEntity>> search(String query) => _searchNotes(query);

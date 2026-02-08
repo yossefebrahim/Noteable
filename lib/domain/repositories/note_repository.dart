@@ -23,4 +23,10 @@ abstract interface class NoteRepository implements BaseRepository {
   Future<String> exportAllNotes(String format);
 
   Future<String> getShareableNoteContent(String id);
+
+  Future<Note> softDeleteNote(String id);
+
+  Future<Note> restoreNote(String id);
+
+  Future<Note?> getDeletedNote(String id);
 }

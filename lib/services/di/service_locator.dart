@@ -11,12 +11,17 @@ import 'package:noteable_app/domain/usecases/export/export_all_notes_usecase.dar
 import 'package:noteable_app/domain/usecases/export/share_note_usecase.dart';
 import 'package:noteable_app/presentation/providers/app_provider.dart';
 import 'package:noteable_app/presentation/providers/export_view_model.dart';
+import 'package:noteable_app/presentation/providers/folder_provider.dart';
 import 'package:noteable_app/presentation/providers/note_detail_view_model.dart';
 import 'package:noteable_app/presentation/providers/notes_view_model.dart';
+import 'package:noteable_app/services/platform/channels/widget_channel.dart';
+import 'package:noteable_app/services/platform/data_sync_service.dart';
 
 final GetIt sl = GetIt.instance;
 
 Future<void> setupServiceLocator() async {
+  sl.registerLazySingleton<WidgetChannel>(WidgetChannel.new);
+  sl.registerLazySingleton<DataSyncService>(DataSyncService.new);
   sl.registerLazySingleton<AppProvider>(AppProvider.new);
   sl.registerLazySingleton<NotesFeatureRepository>(InMemoryNotesFeatureRepository.new);
   sl.registerLazySingleton<ExportService>(ExportService.new);
@@ -27,6 +32,7 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<DeleteNoteUseCase>(() => DeleteNoteUseCase(sl()));
   sl.registerLazySingleton<TogglePinUseCase>(() => TogglePinUseCase(sl()));
   sl.registerLazySingleton<SearchNotesUseCase>(() => SearchNotesUseCase(sl()));
+  sl.registerLazySingleton<RestoreNoteUseCase>(() => RestoreNoteUseCase(sl()));
 
   sl.registerLazySingleton<GetFoldersUseCase>(() => GetFoldersUseCase(sl()));
   sl.registerLazySingleton<CreateFolderUseCase>(() => CreateFolderUseCase(sl()));
@@ -57,20 +63,17 @@ Future<void> setupServiceLocator() async {
       renameFolder: sl(),
       deleteFolder: sl(),
       searchNotes: sl(),
+      restoreNote: sl(),
     )..load(),
   );
 
   sl.registerFactory<NoteEditorViewModel>(
-    () => NoteEditorViewModel(
-      createNote: sl(),
-      updateNote: sl(),
-      getNotes: sl(),
-    ),
+    () => NoteEditorViewModel(createNote: sl(), updateNote: sl(), getNotes: sl()),
   );
 
-  sl.registerFactory<ExportViewModel>(
-    () => ExportViewModel(
-      noteRepository: sl(),
-    ),
-  );
+  sl.registerFactory<ExportViewModel>(() => ExportViewModel(noteRepository: sl()));
+}
+
+Future<void> resetServiceLocator() async {
+  await sl.reset();
 }

@@ -1,0 +1,36 @@
+{
+  "project_type": "single",
+  "services": {
+    "flutter_app": {
+      "path": ".",
+      "tech_stack": ["flutter", "dart", "isar"],
+      "dev_command": "flutter run",
+      "test_command": "flutter test",
+      "build_command": "flutter build apk --debug && flutter build ios --debug"
+    },
+    "ios_widget": {
+      "path": "ios",
+      "tech_stack": ["swift", "widgetkit", "xcode"],
+      "build_command": "xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Debug"
+    },
+    "android_widget": {
+      "path": "android",
+      "tech_stack": ["kotlin", "app-widget", "gradle"],
+      "build_command": "./gradlew assembleDebug"
+    }
+  },
+  "infrastructure": {
+    "flutter": true,
+    "ios": true,
+    "android": true,
+    "database": "isar",
+    "app_groups_required": true
+  },
+  "conventions": {
+    "linter": "flutter_lints",
+    "formatter": "dart format",
+    "testing": "flutter_test + mockito",
+    "architecture": "clean_architecture",
+    "state_management": "provider"
+  }
+}

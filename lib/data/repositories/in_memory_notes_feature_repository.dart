@@ -5,6 +5,7 @@ import 'package:noteable_app/domain/repositories/notes_feature_repository.dart';
 class InMemoryNotesFeatureRepository implements NotesFeatureRepository {
   final Map<String, NoteEntity> _notes = <String, NoteEntity>{};
   final Map<String, FolderEntity> _folders = <String, FolderEntity>{};
+  final Map<String, NoteEntity> _deletedNotes = <String, NoteEntity>{};
 
   int _noteSeed = 0;
   int _folderSeed = 0;
@@ -19,7 +20,23 @@ class InMemoryNotesFeatureRepository implements NotesFeatureRepository {
 
   @override
   Future<void> deleteNote(String id) async {
-    _notes.remove(id);
+    final note = _notes.remove(id);
+    if (note != null) {
+      _deletedNotes[id] = note;
+    }
+  }
+
+  /// Soft delete a note (move to deleted notes collection)
+  Future<void> softDeleteNote(String id) async {
+    await deleteNote(id);
+  }
+
+  /// Restore a note from deleted notes collection
+  Future<void> restoreNote(String id) async {
+    final note = _deletedNotes.remove(id);
+    if (note != null) {
+      _notes[id] = note;
+    }
   }
 
   @override
