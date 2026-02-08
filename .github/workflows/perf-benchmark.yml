@@ -142,15 +142,13 @@ jobs:
               });
             }
 
-      - name: Fail on performance regression
-        if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+      - name: Check for performance regression
+        if: always()
         run: |
-          # Check if any performance tests failed
-          if [ -f test_results/perf_test_raw.json ]; then
-            FAILED=$(cat test_results/perf_test_raw.json | jq -r '[.result[] | select(.testID | contains("perf")) | select(.status != "passed")] | length')
-            if [ "$FAILED" -gt 0 ]; then
-              echo "❌ $FAILED performance test(s) failed"
-              exit 1
-            fi
-            echo "✅ All performance tests passed"
-          fi
+          # Run regression detection script
+          # Fails if performance degrades by more than 20%
+          bash scripts/check_performance_regression.sh \
+            --baseline test/perf/baselines.json \
+            --results test_results/perf_test_raw.json \
+            --threshold 20.0 \
+            --verbose
