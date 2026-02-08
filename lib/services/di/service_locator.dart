@@ -69,6 +69,7 @@ Future<void> setupServiceLocator() async {
       createNote: sl(),
       updateNote: sl(),
       getNotes: sl(),
+      audioRepository: sl(),
     ),
   );
 }
