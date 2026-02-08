@@ -38,7 +38,7 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    // Find text fields using DebouncedTextField type
+    // Find text fields using TextField type
     final textFields = find.byType(TextField);
     expect(textFields, findsNWidgets(2));
 
