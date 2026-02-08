@@ -6,11 +6,14 @@ import '../../services/storage/isar_service.dart';
 import '../models/audio_attachment_model.dart';
 import '../models/deleted_note_model.dart';
 import '../models/note_model.dart';
+import '../services/export_service.dart';
 
 class NoteRepositoryImpl implements NoteRepository {
-  NoteRepositoryImpl(this._isarService);
+  NoteRepositoryImpl(this._isarService, [ExportService? exportService])
+    : _exportService = exportService ?? ExportService();
 
   final IsarService _isarService;
+  final ExportService _exportService;
 
   @override
   Future<void> initialize() => _isarService.init();
@@ -90,6 +93,53 @@ class NoteRepositoryImpl implements NoteRepository {
   }
 
   @override
+  Future<String> exportNote(String id, String format) async {
+    final model = await _isarService.getNoteById(int.parse(id));
+    if (model == null) throw StateError('Note not found: $id');
+
+    final exportFormat = _parseExportFormat(format);
+    final result = await _exportService.exportSingleNote(model, exportFormat);
+    return result.filePath;
+  }
+
+  @override
+  Future<String> exportFolder(String? folderId, String format) async {
+    final allNotes = await _isarService.getNotes();
+    final filteredNotes = folderId == null
+        ? allNotes
+        : allNotes.where((note) => note.folderId == folderId).toList();
+
+    if (filteredNotes.isEmpty) {
+      throw StateError('No notes found in folder');
+    }
+
+    final exportFormat = _parseExportFormat(format);
+    final result = await _exportService.exportMultipleNotes(filteredNotes, exportFormat);
+    return result.filePath;
+  }
+
+  @override
+  Future<String> exportAllNotes(String format) async {
+    final allNotes = await _isarService.getNotes();
+
+    if (allNotes.isEmpty) {
+      throw StateError('No notes to export');
+    }
+
+    final exportFormat = _parseExportFormat(format);
+    final result = await _exportService.exportMultipleNotes(allNotes, exportFormat);
+    return result.filePath;
+  }
+
+  @override
+  Future<String> getShareableNoteContent(String id) async {
+    final model = await _isarService.getNoteById(int.parse(id));
+    if (model == null) throw StateError('Note not found: $id');
+
+    return _exportService.getShareableContent(model);
+  }
+
+  @override
   Future<Note> softDeleteNote(String id) async {
     final note = await getNoteById(id);
     if (note == null) throw StateError('Note not found: $id');
@@ -127,7 +177,7 @@ class NoteRepositoryImpl implements NoteRepository {
     }
 
     final note = await _isarService.getNoteById(noteId);
-    return _toEntity(note!);
+    return await _toEntity(note!);
   }
 
   @override
@@ -188,5 +238,22 @@ class NoteRepositoryImpl implements NoteRepository {
       createdAt: model.createdAt,
       updatedAt: model.updatedAt ?? model.createdAt,
     );
+  }
+
+  ExportFormat _parseExportFormat(String format) {
+    switch (format.toLowerCase()) {
+      case 'markdown':
+      case 'md':
+        return ExportFormat.markdown;
+      case 'txt':
+      case 'text':
+        return ExportFormat.txt;
+      case 'pdf':
+        return ExportFormat.pdf;
+      case 'json':
+        return ExportFormat.json;
+      default:
+        throw ArgumentError('Unsupported export format: $format');
+    }
   }
 }

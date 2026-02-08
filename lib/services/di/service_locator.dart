@@ -1,16 +1,24 @@
 import 'package:get_it/get_it.dart';
 import 'package:noteable_app/data/repositories/audio_repository_impl.dart';
 import 'package:noteable_app/data/repositories/in_memory_notes_feature_repository.dart';
+import 'package:noteable_app/data/repositories/note_repository_impl.dart';
 import 'package:noteable_app/data/repositories/transcription_repository_impl.dart';
+import 'package:noteable_app/data/services/export_service.dart';
 import 'package:noteable_app/domain/repositories/audio_repository.dart';
+import 'package:noteable_app/domain/repositories/note_repository.dart';
 import 'package:noteable_app/domain/repositories/transcription_repository.dart';
 import 'package:noteable_app/domain/repositories/notes_feature_repository.dart';
 import 'package:noteable_app/domain/usecases/audio/create_audio_attachment_usecase.dart';
 import 'package:noteable_app/domain/usecases/audio/transcribe_audio_usecase.dart';
 import 'package:noteable_app/domain/usecases/feature_usecases.dart';
+import 'package:noteable_app/domain/usecases/export/export_note_usecase.dart';
+import 'package:noteable_app/domain/usecases/export/export_folder_usecase.dart';
+import 'package:noteable_app/domain/usecases/export/export_all_notes_usecase.dart';
+import 'package:noteable_app/domain/usecases/export/share_note_usecase.dart';
 import 'package:noteable_app/presentation/providers/app_provider.dart';
 import 'package:noteable_app/presentation/providers/audio_player_provider.dart';
 import 'package:noteable_app/presentation/providers/audio_recorder_provider.dart';
+import 'package:noteable_app/presentation/providers/export_view_model.dart';
 import 'package:noteable_app/presentation/providers/folder_provider.dart';
 import 'package:noteable_app/presentation/providers/note_detail_view_model.dart';
 import 'package:noteable_app/presentation/providers/notes_view_model.dart';
@@ -29,6 +37,7 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<DataSyncService>(DataSyncService.new);
   sl.registerLazySingleton<AppProvider>(AppProvider.new);
   sl.registerLazySingleton<NotesFeatureRepository>(InMemoryNotesFeatureRepository.new);
+  sl.registerLazySingleton<ExportService>(ExportService.new);
 
   // Audio services
   sl.registerLazySingleton<FileStorageService>(FileStorageService.new);
@@ -42,6 +51,11 @@ Future<void> setupServiceLocator() async {
   // Audio repositories
   sl.registerLazySingleton<AudioRepository>(() => AudioRepositoryImpl(sl()));
   sl.registerLazySingleton<TranscriptionRepository>(() => TranscriptionRepositoryImpl(sl()));
+
+  // Note repository (if not already handled by NotesFeatureRepository)
+  if (!sl.isRegistered<NoteRepository>()) {
+    sl.registerLazySingleton<NoteRepository>(() => NoteRepositoryImpl(sl(), sl()));
+  }
 
   // Audio use cases
   sl.registerLazySingleton<CreateAudioAttachmentUseCase>(() => CreateAudioAttachmentUseCase(sl()));
@@ -86,6 +100,8 @@ Future<void> setupServiceLocator() async {
   // Audio providers
   sl.registerLazySingleton<AudioRecorderProvider>(AudioRecorderProvider.new);
   sl.registerFactory<AudioPlayerProvider>(() => AudioPlayerProvider(audioPlayerService: sl()));
+
+  sl.registerFactory<ExportViewModel>(() => ExportViewModel(noteRepository: sl()));
 }
 
 Future<void> resetServiceLocator() async {
