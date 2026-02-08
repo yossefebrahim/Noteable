@@ -42,7 +42,7 @@ class HomeScreen extends StatelessWidget {
                         leading: IconButton(
                           tooltip: note.isPinned ? 'Unpin' : 'Pin',
                           onPressed: () => vm.togglePin(note.id),
-                          icon: Text(note.isPinned ? '📌' : '📍', style: const TextStyle(fontSize: 18)),
+                          icon: Icon(note.isPinned ? Icons.push_pin : Icons.push_pin_outlined),
                         ),
                         onTap: () => context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes()),
                         trailing: IconButton(
