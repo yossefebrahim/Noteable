@@ -17,7 +17,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = -1;
 
-  KeyEventResult _handleKeyEvent(KeyEvent event, NotesViewModel vm, BuildContext context) {
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event, NotesViewModel vm, BuildContext context) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
     if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
@@ -61,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           child: Focus(
             autofocus: true,
-            onKeyEvent: (KeyEvent event) => _handleKeyEvent(event, vm, context),
+            onKeyEvent: (FocusNode node, KeyEvent event) => _handleKeyEvent(node, event, vm, context),
             child: Scaffold(
               appBar: AppBar(
                 title: const Text('Notes'),

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:noteable_app/core/models/shortcut_action.dart';
 
@@ -16,7 +15,7 @@ class DefaultShortcuts {
 
   /// Default shortcuts for the application.
   /// These work with Cmd on macOS and Ctrl on Windows/Linux.
-  static const List<KeyboardShortcut> all = [
+  static final List<KeyboardShortcut> all = [
     // File operations
     KeyboardShortcut(
       action: ShortcutAction.newNote,

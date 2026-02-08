@@ -53,7 +53,7 @@ enum ShortcutAction {
 
 /// Data model representing a keyboard shortcut.
 class KeyboardShortcut {
-  const KeyboardShortcut({
+  KeyboardShortcut({
     required this.action,
     required this.key,
     required this.modifiers,

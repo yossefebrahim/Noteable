@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/models/shortcut_action.dart';
-import '../../core/models/shortcut_action.dart' show KeyboardShortcut;
 import '../../core/theme/app_text_styles.dart';
 import '../providers/keyboard_shortcuts_provider.dart';
 
@@ -217,7 +216,7 @@ class _ShortcutCustomizationDialogState
     });
   }
 
-  KeyEventResult _handleKeyEvent(KeyEvent event) {
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
     if (!_isCapturing) return KeyEventResult.ignored;
 
     // Only handle key down events
