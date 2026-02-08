@@ -33,9 +33,9 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<DeleteFolderUseCase>(() => DeleteFolderUseCase(sl()));
 
   // Export use cases
-  // Note: ExportNoteUseCase, ExportFolderUseCase, and ShareNoteUseCase require
-  // runtime parameters (noteId, folderId, format) and are instantiated directly
-  // where needed with those parameters.
+  // Note: ExportNoteUseCase, ExportFolderUseCase, ExportAllNotesUseCase,
+  // and ShareNoteUseCase require runtime parameters (noteId, folderId, format)
+  // and are instantiated directly where needed with those parameters.
   //
   // Example usage:
   // final exportUseCase = ExportNoteUseCase(
