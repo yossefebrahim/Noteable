@@ -318,3 +318,34 @@ Session 10 (Coder - subtask-5-2):
 - Committed: auto-claude/007-note-export-sharing 60675cf
 
 === END SESSION 10 ===
+Session 11 (Coder - subtask-5-3):
+- Added export button to NoteDetailScreen
+- Updated lib/presentation/screens/note_detail/note_detail_screen.dart:
+  * Added imports for export_view_model, export_options_bottom_sheet, share_plus, export_service
+  * Added export button IconButton to AppBar actions (before pin button)
+  * Button only enabled when editing an existing note (isEditing check)
+  * Icon: Icons.share with tooltip 'Export'
+- Implemented _handleExportPressed() method:
+  * Gets current note from NoteEditorViewModel
+  * Shows ExportOptionsBottomSheet with callbacks
+  * Export callback: calls exportVm.exportNote() and shows SnackBar result
+  * Share callback: calls exportVm.getShareableContent() and Share.share()
+- Implemented _showExportResultSnackBar() method:
+  * Shows success/failure SnackBar with format name
+  * Uses SnackBarBehavior.floating for modern look
+- Registered ExportViewModel in lib/services/di/service_locator.dart:
+  * Added import for ExportViewModel
+  * Registered as factory with NoteRepository dependency
+- Pattern compliance verified:
+  * Uses context.read for ViewModel access
+  * Proper mounted checks before navigation
+  * follow existing IconButton pattern (pin button)
+  * Type annotations on all methods
+- Quality checks passed:
+  * No console.log or debugging statements
+  * Proper error handling (SnackBar feedback)
+  * Follows established code style
+  * Clean commit history
+- Committed: auto-claude/007-note-export-sharing 37f0c80
+
+=== END SESSION 11 ===

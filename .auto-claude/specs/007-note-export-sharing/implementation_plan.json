@@ -2,7 +2,7 @@
   "feature": "Note Export & Sharing",
   "description": "# Note Export & Sharing\n\nImplement export to multiple formats (Markdown, TXT, PDF, JSON) and sharing to other apps. Users should have full control over their data and be able to use it outside the app.\n\n## Rationale\nAddresses Simplenote's limited export functionality (pain-5-3), a major reason users leave for more flexible apps. Data portability is essential for user trust and addresses concerns about being locked into one app. Competitor gap-10 emphasizes privacy and local storage.\n\n## User Stories\n- As a user, I want to export my notes to Markdown, so that I can use them in other apps or publish them\n- As a user, I want to share notes with others via email or messaging, so that I can collaborate\n- As a user, I want to backup all my notes to a file, so that I have control over my data\n\n## Acceptance Criteria\n- [ ] Export single note to Markdown, TXT, PDF, and JSON formats\n- [ ] Export entire folder or all notes as ZIP archive\n- [ ] Share note text to other apps via native share sheet\n- [ ] Exported Markdown preserves formatting structure\n- [ ] PDF export includes proper formatting and page breaks\n- [ ] JSON export allows for backup and potential migration\n- [ ] Export process is fast even for large note collections\n",
   "created_at": "2026-02-07T23:21:17.346Z",
-  "updated_at": "2026-02-08T00:37:39.824Z",
+  "updated_at": "2026-02-08T00:41:25.914Z",
   "status": "in_progress",
   "workflow_type": "feature",
   "workflow_rationale": "This is a new feature implementation for a Flutter app. The feature workflow is appropriate as we're adding export functionality that spans multiple architectural layers (domain use cases, data service, presentation UI) within a single service. The app follows Clean Architecture with clear separation between domain, data, and presentation layers.",
@@ -411,7 +411,9 @@
             "type": "manual",
             "instructions": "Verify export button appears in note detail screen and opens export options"
           },
-          "status": "pending"
+          "status": "completed",
+          "notes": "Added export button to NoteDetailScreen. Button appears in AppBar before the pin button, only enabled when editing an existing note. Shows ExportOptionsBottomSheet on press. Integrated ExportViewModel for export and share_plus for native sharing. Added SnackBar feedback for export results. Also registered ExportViewModel in service_locator.dart.",
+          "updated_at": "2026-02-08T00:40:38.909848+00:00"
         },
         {
           "id": "subtask-5-4",
@@ -663,5 +665,5 @@
   "planStatus": "in_progress",
   "xstateState": "ready_for_implementation",
   "executionPhase": "coding",
-  "last_updated": "2026-02-08T00:40:00.000000+00:00"
+  "last_updated": "2026-02-08T00:40:38.909861+00:00"
 }
