@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:noteable_app/data/repositories/in_memory_notes_feature_repository.dart';
+import 'package:noteable_app/data/services/export_service.dart';
 import 'package:noteable_app/domain/repositories/notes_feature_repository.dart';
 import 'package:noteable_app/domain/usecases/feature_usecases.dart';
 import 'package:noteable_app/presentation/providers/app_provider.dart';
@@ -11,6 +12,7 @@ final GetIt sl = GetIt.instance;
 Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<AppProvider>(AppProvider.new);
   sl.registerLazySingleton<NotesFeatureRepository>(InMemoryNotesFeatureRepository.new);
+  sl.registerLazySingleton<ExportService>(ExportService.new);
 
   sl.registerLazySingleton<GetNotesUseCase>(() => GetNotesUseCase(sl()));
   sl.registerLazySingleton<CreateNoteUseCase>(() => CreateNoteUseCase(sl()));
