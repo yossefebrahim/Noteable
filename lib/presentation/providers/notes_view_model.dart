@@ -57,13 +57,21 @@ class NotesViewModel extends ChangeNotifier {
   }
 
   Future<void> deleteNote(String id) async {
+    _isLoading = true;
+    notifyListeners();
     await _deleteNote(id);
-    await refreshNotes();
+    _notes = await _getNotes();
+    _isLoading = false;
+    notifyListeners();
   }
 
   Future<void> togglePin(String id) async {
+    _isLoading = true;
+    notifyListeners();
     await _togglePin(id);
-    await refreshNotes();
+    _notes = await _getNotes();
+    _isLoading = false;
+    notifyListeners();
   }
 
   Future<void> createFolder(String name) async {
@@ -91,7 +99,9 @@ class NotesViewModel extends ChangeNotifier {
     notifyListeners();
     await _deleteFolder(id);
     _folders = await _getFolders();
-    await refreshNotes();
+    _notes = await _getNotes();
+    _isLoading = false;
+    notifyListeners();
   }
 
   Future<List<NoteEntity>> search(String query) => _searchNotes(query);
