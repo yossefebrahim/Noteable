@@ -61,3 +61,16 @@ class DeleteFolderUseCase {
   final NotesFeatureRepository repo;
   Future<void> call(String id) => repo.deleteFolder(id);
 }
+
+class RestoreNoteUseCase {
+  RestoreNoteUseCase(this.repo);
+  final NotesFeatureRepository repo;
+  Future<void> call(String id) async {
+    if (repo is dynamic) {
+      final dynamic repoDynamic = repo;
+      if (repoDynamic.restoreNote != null) {
+        await repoDynamic.restoreNote(id);
+      }
+    }
+  }
+}

@@ -23,6 +23,7 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<DeleteNoteUseCase>(() => DeleteNoteUseCase(sl()));
   sl.registerLazySingleton<TogglePinUseCase>(() => TogglePinUseCase(sl()));
   sl.registerLazySingleton<SearchNotesUseCase>(() => SearchNotesUseCase(sl()));
+  sl.registerLazySingleton<RestoreNoteUseCase>(() => RestoreNoteUseCase(sl()));
 
   sl.registerLazySingleton<GetFoldersUseCase>(() => GetFoldersUseCase(sl()));
   sl.registerLazySingleton<CreateFolderUseCase>(() => CreateFolderUseCase(sl()));
@@ -39,6 +40,7 @@ Future<void> setupServiceLocator() async {
       renameFolder: sl(),
       deleteFolder: sl(),
       searchNotes: sl(),
+      restoreNote: sl(),
     )..load(),
   );
 

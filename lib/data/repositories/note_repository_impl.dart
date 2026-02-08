@@ -2,6 +2,7 @@ import 'package:noteable_app/domain/entities/note.dart';
 import 'package:noteable_app/domain/repositories/note_repository.dart';
 
 import '../../services/storage/isar_service.dart';
+import '../models/deleted_note_model.dart';
 import '../models/note_model.dart';
 
 class NoteRepositoryImpl implements NoteRepository {
@@ -68,6 +69,65 @@ class NoteRepositoryImpl implements NoteRepository {
     await _isarService.putNote(model);
     final updated = await _isarService.getNoteById(model.id);
     return _toEntity(updated!);
+  }
+
+  @override
+  Future<Note> softDeleteNote(String id) async {
+    final note = await getNoteById(id);
+    if (note == null) throw StateError('Note not found: $id');
+
+    final noteId = int.parse(id);
+    final deletedNote = DeletedNoteModel(
+      noteId: noteId,
+      title: note.title,
+      content: note.content,
+      createdAt: note.createdAt,
+      updatedAt: note.updatedAt,
+      isPinned: note.isPinned,
+      folderId: note.folderId,
+      deletedAt: DateTime.now(),
+    );
+
+    await _isarService.putDeletedNote(deletedNote);
+    await _isarService.deleteNote(noteId);
+
+    return note;
+  }
+
+  @override
+  Future<Note> restoreNote(String id) async {
+    final noteId = int.parse(id);
+    final deletedNote = await _isarService.getDeletedNoteByNoteId(noteId);
+
+    if (deletedNote == null) {
+      throw StateError('Deleted note not found for note ID: $id');
+    }
+
+    final restored = await _isarService.restoreDeletedNote(deletedNote.id);
+    if (!restored) {
+      throw StateError('Failed to restore note: $id');
+    }
+
+    final note = await _isarService.getNoteById(noteId);
+    return _toEntity(note!);
+  }
+
+  @override
+  Future<Note?> getDeletedNote(String id) async {
+    final noteId = int.parse(id);
+    final deletedNote = await _isarService.getDeletedNoteByNoteId(noteId);
+
+    if (deletedNote == null) return null;
+
+    return Note(
+      id: deletedNote.noteId.toString(),
+      title: deletedNote.title,
+      content: deletedNote.content,
+      isPinned: deletedNote.isPinned,
+      folderId: deletedNote.folderId,
+      createdAt: deletedNote.createdAt,
+      updatedAt: deletedNote.updatedAt ?? deletedNote.createdAt,
+    );
   }
 
   NoteModel _toModel(Note note) => NoteModel(

@@ -13,6 +13,7 @@ class NotesViewModel extends ChangeNotifier {
     required RenameFolderUseCase renameFolder,
     required DeleteFolderUseCase deleteFolder,
     required SearchNotesUseCase searchNotes,
+    required RestoreNoteUseCase restoreNote,
   }) : _getNotes = getNotes,
        _deleteNote = deleteNote,
        _togglePin = togglePin,
@@ -20,7 +21,8 @@ class NotesViewModel extends ChangeNotifier {
        _createFolder = createFolder,
        _renameFolder = renameFolder,
        _deleteFolder = deleteFolder,
-       _searchNotes = searchNotes;
+       _searchNotes = searchNotes,
+       _restoreNote = restoreNote;
 
   final GetNotesUseCase _getNotes;
   final DeleteNoteUseCase _deleteNote;
@@ -30,6 +32,7 @@ class NotesViewModel extends ChangeNotifier {
   final RenameFolderUseCase _renameFolder;
   final DeleteFolderUseCase _deleteFolder;
   final SearchNotesUseCase _searchNotes;
+  final RestoreNoteUseCase _restoreNote;
 
   List<NoteEntity> _notes = <NoteEntity>[];
   List<FolderEntity> _folders = <FolderEntity>[];
@@ -72,6 +75,11 @@ class NotesViewModel extends ChangeNotifier {
     _notes = await _getNotes();
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> restoreNote(String id) async {
+    await _restoreNote(id);
+    await refreshNotes();
   }
 
   Future<void> createFolder(String name) async {

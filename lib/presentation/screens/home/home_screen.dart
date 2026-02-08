@@ -92,24 +92,57 @@ class HomeScreen extends StatelessWidget {
             color: Colors.black26,
             child: const Center(child: CircularProgressIndicator()),
           ),
-      ],
+          body: vm.notes.isEmpty
+              ? EmptyNotesState(
+                  onCreateTap: () => context.push('/note-detail').then((_) => vm.refreshNotes()),
+                )
+              : ListView.separated(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: vm.notes.length,
+                  separatorBuilder: (_, index) => const SizedBox(height: 12),
+                  itemBuilder: (BuildContext context, int index) {
+                    final NoteEntity note = vm.notes[index];
+                    return Card(
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        title: Text(note.title.isEmpty ? 'Untitled' : note.title),
+                        subtitle: Text(note.content.isEmpty ? 'Start writing…' : note.content, maxLines: 2, overflow: TextOverflow.ellipsis),
+                        leading: IconButton(
+                          tooltip: note.isPinned ? 'Unpin' : 'Pin',
+                          onPressed: () => vm.togglePin(note.id),
+                          icon: Icon(note.isPinned ? Icons.push_pin : Icons.push_pin_outlined),
+                        ),
+                        onTap: () => context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes()),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: () => _deleteNote(context, vm, note),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        );
+      },
     );
   }
 
-  Future<void> _confirmDelete(BuildContext context, NotesViewModel vm, NoteEntity note) async {
-    final bool? confirm = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Delete note?'),
-        content: Text('"${note.title.isEmpty ? 'Untitled' : note.title}" will be removed.'),
-        actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
-        ],
+  Future<void> _deleteNote(BuildContext context, NotesViewModel vm, NoteEntity note) async {
+    final noteId = note.id;
+    final noteTitle = note.title.isEmpty ? 'Untitled' : note.title;
+
+    await vm.deleteNote(noteId);
+
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 4),
+        content: Text('$noteTitle deleted'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () => vm.restoreNote(noteId),
+        ),
       ),
     );
-    if (confirm == true) {
-      await vm.deleteNote(note.id);
-    }
   }
 }
