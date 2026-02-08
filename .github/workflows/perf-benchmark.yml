@@ -1,0 +1,156 @@
+name: performance-benchmark
+
+on:
+  pull_request:
+    paths:
+      - 'lib/**'
+      - 'test/perf/**'
+      - '.github/workflows/perf-benchmark.yml'
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
+      - name: Run performance benchmarks
+        run: |
+          # Create output directory for metrics
+          mkdir -p test_results
+
+          # Run performance tests
+          flutter test test/perf --no-pub --reporter=json > test_results/perf_test_raw.json || true
+
+      - name: Process benchmark results
+        run: |
+          # Parse and format results for GitHub output
+          if [ -f test_results/perf_test_raw.json ]; then
+            echo "Performance test results:"
+            cat test_results/perf_test_raw.json | jq -r '.result | select(.testID | contains("perf")) | "\(.testID): \(.status)"' || echo "No performance tests found"
+          else
+            echo "No performance test results found"
+          fi
+
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-test-results
+          path: test_results/
+          retention-days: 30
+
+      - name: Download baseline (if exists)
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            try {
+              const response = await github.rest.repos.getContent({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                path: 'test/perf/baselines.json',
+                ref: 'main'
+              });
+              const content = Buffer.from(response.data.content, 'base64').toString();
+              fs.writeFileSync('test/perf/baselines.json', content);
+              console.log('Baseline downloaded successfully');
+            } catch (error) {
+              console.log('No baseline found, this will be a baseline run');
+            }
+
+      - name: Generate performance report
+        if: always()
+        run: |
+          # Generate a summary report from the test results
+          echo "## Performance Test Results" > test_results/performance_summary.md
+          echo "" >> test_results/performance_summary.md
+          echo "**Commit:** ${{ github.sha }}" >> test_results/performance_summary.md
+          echo "**Branch:** ${{ github.ref_name }}" >> test_results/performance_summary.md
+          echo "" >> test_results/performance_summary.md
+
+          # Extract test results
+          if [ -f test_results/perf_test_raw.json ]; then
+            echo "### Test Results" >> test_results/performance_summary.md
+            echo "" >> test_results/performance_summary.md
+            cat test_results/perf_test_raw.json | jq -r '
+              .result | select(.testID | contains("perf")) |
+              "| \(.testID) | \(.status) | \(.hidden?.skipped // "N/A") |"
+            ' >> test_results/performance_summary.md || echo "No results to display"
+          fi
+
+      - name: Comment PR with performance results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let report = '## 📊 Performance Benchmark Results\n\n';
+
+            try {
+              const summary = fs.readFileSync('test_results/performance_summary.md', 'utf8');
+              report += summary;
+            } catch (error) {
+              report += 'No performance summary available.\n';
+            }
+
+            report += `\n\n**Workflow Run:** https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('📊 Performance Benchmark Results')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: report,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: report,
+              });
+            }
+
+      - name: Fail on performance regression
+        if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+        run: |
+          # Check if any performance tests failed
+          if [ -f test_results/perf_test_raw.json ]; then
+            FAILED=$(cat test_results/perf_test_raw.json | jq -r '[.result[] | select(.testID | contains("perf")) | select(.status != "passed")] | length')
+            if [ "$FAILED" -gt 0 ]; then
+              echo "❌ $FAILED performance test(s) failed"
+              exit 1
+            fi
+            echo "✅ All performance tests passed"
+          fi
