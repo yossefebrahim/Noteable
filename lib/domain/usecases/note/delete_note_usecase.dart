@@ -13,7 +13,7 @@ class DeleteNoteUseCase {
 
   Future<Result<void>> call() async {
     try {
-      await _noteRepository.deleteNote(_noteId);
+      await _noteRepository.softDeleteNote(_noteId);
       return const Result.success(null);
     } catch (e) {
       return Result.failure('Failed to delete note: $e');
