@@ -66,12 +66,45 @@ class IsarService {
 
   Future<List<NoteModel>> searchNotes(String query) async {
     final database = await db;
-    return database.noteModels
+
+    // Search notes by title/content
+    final notesByText = await database.noteModels
         .filter()
         .titleContains(query, caseSensitive: false)
         .or()
         .contentContains(query, caseSensitive: false)
         .findAll();
+
+    // Search transcriptions by text
+    final transcriptions = await database.transcriptionModels
+        .filter()
+        .textContains(query, caseSensitive: false)
+        .findAll();
+
+    // Get audio attachments for matching transcriptions
+    final audioAttachmentIds =
+        transcriptions.map((t) => t.audioAttachmentId).nonNulls.toSet();
+    final audioAttachments = await database.audioAttachmentModels
+        .filter()
+        .anyOf(audioAttachmentIds.toList(), (q) => q.idEqualTo(q))
+        .findAll();
+
+    // Get notes for matching audio attachments
+    final noteIds =
+        audioAttachments.map((a) => a.noteId).nonNulls.map(int.parse).toSet();
+    final notesByTranscription = await database.noteModels
+        .filter()
+        .anyOf(noteIds.toList(), (q) => q.idEqualTo(q))
+        .findAll();
+
+    // Combine and deduplicate results
+    final allNotes = [...notesByText, ...notesByTranscription];
+    final uniqueNotes = <Id, NoteModel>{
+      for (final note in allNotes) note.id: note
+    };
+
+    return uniqueNotes.values.toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
   Future<Id> putFolder(FolderModel folder) async {
