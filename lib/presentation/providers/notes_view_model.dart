@@ -61,6 +61,11 @@ class NotesViewModel extends ChangeNotifier {
     await refreshNotes();
   }
 
+  Future<void> restoreNote(String id) async {
+    await _restoreNote(id);
+    await refreshNotes();
+  }
+
   Future<void> createFolder(String name) async {
     if (name.trim().isEmpty) return;
     await _createFolder(name.trim());
