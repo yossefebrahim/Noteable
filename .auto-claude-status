@@ -1,25 +1,25 @@
 {
   "active": true,
-  "spec": "004-note-templates",
+  "spec": "006-optimized-typing-performance",
   "state": "building",
   "subtasks": {
-    "completed": 18,
-    "total": 19,
+    "completed": 6,
+    "total": 7,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Integration",
+    "current": "Manual Verification",
     "id": null,
-    "total": 5
+    "total": 1
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 17,
-    "started_at": "2026-02-08T00:31:28.972157"
+    "number": 8,
+    "started_at": "2026-02-08T01:19:05.703138"
   },
-  "last_update": "2026-02-08T01:29:56.388640"
+  "last_update": "2026-02-08T01:45:16.582095"
 }
