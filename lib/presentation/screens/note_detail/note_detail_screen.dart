@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../domain/entities/audio_attachment.dart';
+import '../../providers/audio_player_provider.dart';
+import '../../providers/audio_recorder_provider.dart';
 import '../../providers/note_detail_view_model.dart';
 import '../../providers/notes_view_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
+import '../../widgets/audio_player_widget.dart';
+import '../../widgets/audio_recorder_widget.dart';
 
 class NoteDetailScreen extends StatefulWidget {
   const NoteDetailScreen({super.key, this.noteId});
@@ -48,6 +53,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     final bool isEditing = context.select<NoteEditorViewModel, bool>((NoteEditorViewModel vm) => vm.hasNote);
     final bool isPinned = context.select<NoteEditorViewModel, bool>((NoteEditorViewModel vm) => vm.note?.isPinned ?? false);
     final bool isSaving = context.select<NoteEditorViewModel, bool>((NoteEditorViewModel vm) => vm.isSaving);
+    final audioAttachments = context.select<NoteEditorViewModel, List>((NoteEditorViewModel vm) => vm.audioAttachments);
 
     return Scaffold(
       appBar: AppBar(
@@ -81,7 +87,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           ),
         ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: <Widget>[
@@ -91,16 +97,114 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               onChanged: (String value) => context.read<NoteEditorViewModel>().updateDraft(title: value),
             ),
             const SizedBox(height: 12),
-            Expanded(
-              child: AppTextField(
-                controller: _contentController,
-                hintText: 'Start writing...',
-                maxLines: null,
-                onChanged: (String value) => context.read<NoteEditorViewModel>().updateDraft(content: value),
-              ),
+            AppTextField(
+              controller: _contentController,
+              hintText: 'Start writing...',
+              maxLines: null,
+              minLines: 10,
+              onChanged: (String value) => context.read<NoteEditorViewModel>().updateDraft(content: value),
             ),
+            const SizedBox(height: 16),
+            // Audio section
+            _buildAudioSection(context, audioAttachments),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAudioSection(BuildContext context, List<AudioAttachment> audioAttachments) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Existing audio attachments
+        if (audioAttachments.isNotEmpty) ...[
+          Text(
+            'Audio Attachments',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...List<Widget>.generate(
+            audioAttachments.length,
+            (int index) {
+              final attachment = audioAttachments[index];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _AudioPlayerTile(
+                  attachment: attachment,
+                  onDelete: () => _deleteAudioAttachment(attachment.id),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+        ],
+        // Audio recorder widget
+        Text(
+          'Record Audio',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Consumer<AudioRecorderProvider>(
+          builder: (BuildContext context, AudioRecorderProvider recorder, Widget? child) {
+            return AudioRecorderWidget(provider: recorder);
+          },
+        ),
+      ],
+    );
+  }
+
+  void _deleteAudioAttachment(String attachmentId) {
+    context.read<NoteEditorViewModel>().removeAudioAttachment(attachmentId);
+  }
+}
+
+class _AudioPlayerTile extends StatefulWidget {
+  const _AudioPlayerTile({
+    required this.attachment,
+    this.onDelete,
+  });
+
+  final AudioAttachment attachment;
+  final VoidCallback? onDelete;
+
+  @override
+  State<_AudioPlayerTile> createState() => _AudioPlayerTileState();
+}
+
+class _AudioPlayerTileState extends State<_AudioPlayerTile> {
+  late final AudioPlayerProvider _playerProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    _playerProvider = context.read<AudioPlayerProvider>();
+    // Load audio when widget initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _playerProvider.loadAudio(widget.attachment.path);
+    });
+  }
+
+  @override
+  void didUpdateWidget(_AudioPlayerTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.attachment.path != widget.attachment.path) {
+      _playerProvider.loadAudio(widget.attachment.path);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<AudioPlayerProvider>.value(
+      value: _playerProvider,
+      child: AudioPlayerWidget(
+        provider: _playerProvider,
+        waveformAmplitudes: null, // TODO: Add waveform data when available
+        onDelete: widget.onDelete,
       ),
     );
   }
