@@ -47,7 +47,7 @@ class HomeScreen extends StatelessWidget {
                         onTap: () => context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes()),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete_outline),
-                          onPressed: () => _confirmDelete(context, vm, note),
+                          onPressed: () => _deleteNote(context, vm, note),
                         ),
                       ),
                     );
@@ -58,20 +58,22 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _confirmDelete(BuildContext context, NotesViewModel vm, NoteEntity note) async {
-    final bool? confirm = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Delete note?'),
-        content: Text('"${note.title.isEmpty ? 'Untitled' : note.title}" will be removed.'),
-        actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
-        ],
+  Future<void> _deleteNote(BuildContext context, NotesViewModel vm, NoteEntity note) async {
+    final noteId = note.id;
+    final noteTitle = note.title.isEmpty ? 'Untitled' : note.title;
+
+    await vm.deleteNote(noteId);
+
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$noteTitle deleted'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () => vm.restoreNote(noteId),
+        ),
       ),
     );
-    if (confirm == true) {
-      await vm.deleteNote(note.id);
-    }
   }
 }
