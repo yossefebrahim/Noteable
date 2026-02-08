@@ -17,4 +17,10 @@ abstract interface class NoteRepository implements BaseRepository {
   Future<List<Note>> searchNotes(String query);
 
   Future<List<Note>> getNotesWithAudioAttachments();
+
+  Future<Note> softDeleteNote(String id);
+
+  Future<Note> restoreNote(String id);
+
+  Future<Note?> getDeletedNote(String id);
 }

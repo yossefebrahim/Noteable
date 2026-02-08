@@ -10,17 +10,22 @@ import 'package:noteable_app/domain/usecases/feature_usecases.dart';
 import 'package:noteable_app/presentation/providers/app_provider.dart';
 import 'package:noteable_app/presentation/providers/audio_player_provider.dart';
 import 'package:noteable_app/presentation/providers/audio_recorder_provider.dart';
+import 'package:noteable_app/presentation/providers/folder_provider.dart';
 import 'package:noteable_app/presentation/providers/note_detail_view_model.dart';
 import 'package:noteable_app/presentation/providers/notes_view_model.dart';
 import 'package:noteable_app/services/audio/audio_player_service.dart';
 import 'package:noteable_app/services/audio/audio_recorder_service.dart';
 import 'package:noteable_app/services/audio/transcription_service.dart';
+import 'package:noteable_app/services/platform/channels/widget_channel.dart';
+import 'package:noteable_app/services/platform/data_sync_service.dart';
 import 'package:noteable_app/services/storage/file_storage_service.dart';
 import 'package:noteable_app/services/storage/isar_service.dart';
 
 final GetIt sl = GetIt.instance;
 
 Future<void> setupServiceLocator() async {
+  sl.registerLazySingleton<WidgetChannel>(WidgetChannel.new);
+  sl.registerLazySingleton<DataSyncService>(DataSyncService.new);
   sl.registerLazySingleton<AppProvider>(AppProvider.new);
   sl.registerLazySingleton<NotesFeatureRepository>(InMemoryNotesFeatureRepository.new);
 
@@ -47,6 +52,7 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<DeleteNoteUseCase>(() => DeleteNoteUseCase(sl()));
   sl.registerLazySingleton<TogglePinUseCase>(() => TogglePinUseCase(sl()));
   sl.registerLazySingleton<SearchNotesUseCase>(() => SearchNotesUseCase(sl()));
+  sl.registerLazySingleton<RestoreNoteUseCase>(() => RestoreNoteUseCase(sl()));
 
   sl.registerLazySingleton<GetFoldersUseCase>(() => GetFoldersUseCase(sl()));
   sl.registerLazySingleton<CreateFolderUseCase>(() => CreateFolderUseCase(sl()));
@@ -63,6 +69,7 @@ Future<void> setupServiceLocator() async {
       renameFolder: sl(),
       deleteFolder: sl(),
       searchNotes: sl(),
+      restoreNote: sl(),
     )..load(),
   );
 
@@ -77,7 +84,9 @@ Future<void> setupServiceLocator() async {
 
   // Audio providers
   sl.registerLazySingleton<AudioRecorderProvider>(AudioRecorderProvider.new);
-  sl.registerFactory<AudioPlayerProvider>(
-    () => AudioPlayerProvider(audioPlayerService: sl()),
-  );
+  sl.registerFactory<AudioPlayerProvider>(() => AudioPlayerProvider(audioPlayerService: sl()));
+}
+
+Future<void> resetServiceLocator() async {
+  await sl.reset();
 }

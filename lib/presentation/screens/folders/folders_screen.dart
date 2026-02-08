@@ -8,44 +8,62 @@ class FolderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<NotesViewModel>(
-      builder: (BuildContext context, NotesViewModel vm, _) {
-        return Scaffold(
-          appBar: AppBar(title: const Text('Folders')),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => _folderNameDialog(context, title: 'Create folder', onConfirm: vm.createFolder),
-            child: const Icon(Icons.create_new_folder_outlined),
-          ),
-          body: ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: vm.folders.length,
-            itemBuilder: (BuildContext context, int index) {
-              final FolderEntity folder = vm.folders[index];
-              return Card(
-                child: ListTile(
-                  title: Text(folder.name),
-                  leading: const Icon(Icons.folder_outlined),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined),
-                        onPressed: () => _folderNameDialog(
-                          context,
-                          title: 'Rename folder',
-                          initial: folder.name,
-                          onConfirm: (String n) => vm.renameFolder(folder.id, n),
-                        ),
+    final bool isLoading = context.select<NotesViewModel, bool>((NotesViewModel vm) => vm.isLoading);
+
+    return Stack(
+      children: <Widget>[
+        Consumer<NotesViewModel>(
+          builder: (BuildContext context, NotesViewModel vm, _) {
+            return Scaffold(
+              appBar: AppBar(title: const Text('Folders')),
+              floatingActionButton: FloatingActionButton(
+                onPressed: isLoading ? null : () => _folderNameDialog(context, title: 'Create folder', onConfirm: vm.createFolder),
+                child: const Icon(Icons.create_new_folder_outlined),
+              ),
+              body: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: vm.folders.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final FolderEntity folder = vm.folders[index];
+                  return Card(
+                    child: ListTile(
+                      title: Text(folder.name),
+                      leading: const Icon(Icons.folder_outlined),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          IconButton(
+                            icon: const Icon(Icons.edit_outlined),
+                            onPressed: isLoading
+                                ? null
+                                : () => _folderNameDialog(
+                                      context,
+                                      title: 'Rename folder',
+                                      initial: folder.name,
+                                      onConfirm: (String n) => vm.renameFolder(folder.id, n),
+                                    ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: isLoading ? null : () => vm.deleteFolder(folder.id),
+                          ),
+                        ],
                       ),
-                      IconButton(icon: const Icon(Icons.delete_outline), onPressed: () => vm.deleteFolder(folder.id)),
-                    ],
-                  ),
-                ),
-              );
-            },
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
+        if (isLoading)
+          Container(
+            color: Colors.black26,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
           ),
-        );
-      },
+      ],
     );
   }
 

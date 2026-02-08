@@ -2,6 +2,7 @@ import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../data/models/audio_attachment_model.dart';
+import '../../data/models/deleted_note_model.dart';
 import '../../data/models/folder_model.dart';
 import '../../data/models/note_model.dart';
 import '../../data/models/transcription_model.dart';
@@ -23,6 +24,7 @@ class IsarService {
         FolderModelSchema,
         AudioAttachmentModelSchema,
         TranscriptionModelSchema,
+        DeletedNoteModelSchema,
       ],
       directory: dir.path,
       name: 'noteable_db',
@@ -82,16 +84,14 @@ class IsarService {
         .findAll();
 
     // Get audio attachments for matching transcriptions
-    final audioAttachmentIds =
-        transcriptions.map((t) => t.audioAttachmentId).nonNulls.toSet();
+    final audioAttachmentIds = transcriptions.map((t) => t.audioAttachmentId).nonNulls.toSet();
     final audioAttachments = await database.audioAttachmentModels
         .filter()
         .anyOf(audioAttachmentIds.toList(), (q) => q.idEqualTo(q))
         .findAll();
 
     // Get notes for matching audio attachments
-    final noteIds =
-        audioAttachments.map((a) => a.noteId).nonNulls.map(int.parse).toSet();
+    final noteIds = audioAttachments.map((a) => a.noteId).nonNulls.map(int.parse).toSet();
     final notesByTranscription = await database.noteModels
         .filter()
         .anyOf(noteIds.toList(), (q) => q.idEqualTo(q))
@@ -99,12 +99,9 @@ class IsarService {
 
     // Combine and deduplicate results
     final allNotes = [...notesByText, ...notesByTranscription];
-    final uniqueNotes = <Id, NoteModel>{
-      for (final note in allNotes) note.id: note
-    };
+    final uniqueNotes = <Id, NoteModel>{for (final note in allNotes) note.id: note};
 
-    return uniqueNotes.values.toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return uniqueNotes.values.toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
   Future<Id> putFolder(FolderModel folder) async {
@@ -126,9 +123,7 @@ class IsarService {
 
   Future<Id> putAudioAttachment(AudioAttachmentModel audioAttachment) async {
     final database = await db;
-    return database.writeTxn(
-      () => database.audioAttachmentModels.put(audioAttachment),
-    );
+    return database.writeTxn(() => database.audioAttachmentModels.put(audioAttachment));
   }
 
   Future<List<AudioAttachmentModel>> getAudioAttachments() async {
@@ -141,9 +136,7 @@ class IsarService {
     return database.audioAttachmentModels.get(id);
   }
 
-  Future<List<AudioAttachmentModel>> getAudioAttachmentsByNoteId(
-    String noteId,
-  ) async {
+  Future<List<AudioAttachmentModel>> getAudioAttachmentsByNoteId(String noteId) async {
     final database = await db;
     return database.audioAttachmentModels
         .filter()
@@ -161,9 +154,7 @@ class IsarService {
 
   Future<Id> putTranscription(TranscriptionModel transcription) async {
     final database = await db;
-    return database.writeTxn(
-      () => database.transcriptionModels.put(transcription),
-    );
+    return database.writeTxn(() => database.transcriptionModels.put(transcription));
   }
 
   Future<List<TranscriptionModel>> getTranscriptions() async {
@@ -190,5 +181,58 @@ class IsarService {
   Future<bool> deleteTranscription(Id id) async {
     final database = await db;
     return database.writeTxn(() => database.transcriptionModels.delete(id));
+  }
+
+  Future<Id> putDeletedNote(DeletedNoteModel deletedNote) async {
+    final database = await db;
+    return database.writeTxn(() => database.deletedNoteModels.put(deletedNote));
+  }
+
+  Future<DeletedNoteModel?> getDeletedNote(Id id) async {
+    final database = await db;
+    return database.deletedNoteModels.get(id);
+  }
+
+  Future<DeletedNoteModel?> getDeletedNoteByNoteId(Id noteId) async {
+    final database = await db;
+    return database.deletedNoteModels.filter().noteIdEqualTo(noteId).findFirst();
+  }
+
+  Future<List<DeletedNoteModel>> getDeletedNotes() async {
+    final database = await db;
+    return database.deletedNoteModels.where().sortByDeletedAtDesc().findAll();
+  }
+
+  Future<bool> restoreDeletedNote(Id deletedNoteId) async {
+    final database = await db;
+    final deletedNote = await database.deletedNoteModels.get(deletedNoteId);
+
+    if (deletedNote == null) return false;
+
+    await database.writeTxn(() async {
+      // Restore the note
+      final restoredNote = NoteModel(
+        id: deletedNote.noteId,
+        title: deletedNote.title,
+        content: deletedNote.content,
+        createdAt: deletedNote.createdAt,
+        updatedAt: deletedNote.updatedAt,
+        isPinned: deletedNote.isPinned,
+        folderId: deletedNote.folderId,
+      );
+      await database.noteModels.put(restoredNote);
+
+      // Delete the deleted note record
+      await database.deletedNoteModels.delete(deletedNoteId);
+    });
+
+    return true;
+  }
+
+  Future<bool> permanentlyDeleteNote(Id noteId) async {
+    final database = await db;
+    return database.writeTxn(() {
+      return database.deletedNoteModels.filter().noteIdEqualTo(noteId).deleteAll() > 0;
+    });
   }
 }

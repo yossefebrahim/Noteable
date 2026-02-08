@@ -99,9 +99,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     // Extract context around the match (up to 50 chars before and after)
     final start = index > 50 ? index - 50 : 0;
-    final end = index + query.length + 50 < text.length
-        ? index + query.length + 50
-        : text.length;
+    final end = index + query.length + 50 < text.length ? index + query.length + 50 : text.length;
 
     String snippet = text.substring(start, end);
     if (start > 0) snippet = '...$snippet';
@@ -112,7 +110,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final NotesViewModel vm = context.read<NotesViewModel>();
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -141,92 +138,87 @@ class _SearchScreenState extends State<SearchScreen> {
               child: _isSearching
                   ? const Center(child: CircularProgressIndicator())
                   : _results.isEmpty
-                      ? Center(
-                          child: Text(
-                            _searchController.text.trim().isEmpty
-                                ? 'Start typing to search notes'
-                                : 'No notes found',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.6),
-                            ),
-                          ),
-                        )
-                      : ListView.builder(
-                          itemCount: _results.length,
-                          itemBuilder: (_, int index) {
-                            final NoteEntity note = _results[index];
-                            final hasAudio = note.audioAttachments.isNotEmpty;
-                            final transcriptions = _transcriptionsCache[note.id] ?? <Transcription>[];
-                            final hasMatchingTranscriptions = transcriptions.isNotEmpty;
-                            final query = _searchController.text.trim();
+                  ? Center(
+                      child: Text(
+                        _searchController.text.trim().isEmpty
+                            ? 'Start typing to search notes'
+                            : 'No notes found',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: _results.length,
+                      itemBuilder: (_, int index) {
+                        final NoteEntity note = _results[index];
+                        final hasAudio = note.audioAttachments.isNotEmpty;
+                        final transcriptions = _transcriptionsCache[note.id] ?? <Transcription>[];
+                        final hasMatchingTranscriptions = transcriptions.isNotEmpty;
+                        final query = _searchController.text.trim();
 
-                            return Card(
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
+                        return Card(
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            title: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Text(
+                                    note.title.isEmpty ? 'Untitled' : note.title,
+                                    style: theme.textTheme.titleMedium,
+                                  ),
                                 ),
-                                title: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Text(
-                                        note.title.isEmpty ? 'Untitled' : note.title,
-                                        style: theme.textTheme.titleMedium,
-                                      ),
-                                    ),
-                                    if (hasAudio) ...<Widget>[
-                                      Icon(
-                                        Icons.mic,
-                                        size: 16,
-                                        color: theme.colorScheme.primary,
-                                      ),
-                                      const SizedBox(width: 8),
-                                    ],
-                                  ],
+                                if (hasAudio) ...<Widget>[
+                                  Icon(Icons.mic, size: 16, color: theme.colorScheme.primary),
+                                  const SizedBox(width: 8),
+                                ],
+                              ],
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                const SizedBox(height: 4),
+                                Text(
+                                  note.content.isEmpty ? 'No content' : note.content,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodyMedium,
                                 ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      note.content.isEmpty ? 'No content' : note.content,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: theme.textTheme.bodyMedium,
+                                if (hasMatchingTranscriptions && query.isNotEmpty) ...<Widget>[
+                                  const SizedBox(height: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(4),
                                     ),
-                                    if (hasMatchingTranscriptions && query.isNotEmpty) ...<Widget>[
-                                      const SizedBox(height: 8),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: theme.colorScheme.primaryContainer.withOpacity(0.3),
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Row(
                                           children: <Widget>[
-                                            Row(
-                                              children: <Widget>[
-                                                Icon(
-                                                  Icons.transcribe,
-                                                  size: 12,
-                                                  color: theme.colorScheme.primary,
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  'Matching transcription',
-                                                  style: theme.textTheme.bodySmall?.copyWith(
-                                                    color: theme.colorScheme.primary,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
+                                            Icon(
+                                              Icons.transcribe,
+                                              size: 12,
+                                              color: theme.colorScheme.primary,
                                             ),
-                                            const SizedBox(height: 4),
-                                            ...transcriptions.take(2).map(
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              'Matching transcription',
+                                              style: theme.textTheme.bodySmall?.copyWith(
+                                                color: theme.colorScheme.primary,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        ...transcriptions
+                                            .take(2)
+                                            .map(
                                               (transcription) => Padding(
                                                 padding: const EdgeInsets.only(bottom: 4),
                                                 child: Text(
@@ -234,39 +226,41 @@ class _SearchScreenState extends State<SearchScreen> {
                                                   maxLines: 3,
                                                   overflow: TextOverflow.ellipsis,
                                                   style: theme.textTheme.bodySmall?.copyWith(
-                                                    color: theme.colorScheme.onSurface.withOpacity(0.8),
+                                                    color: theme.colorScheme.onSurface.withOpacity(
+                                                      0.8,
+                                                    ),
                                                     fontStyle: FontStyle.italic,
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                            if (transcriptions.length > 2)
-                                              Text(
-                                                '+${transcriptions.length - 2} more match${transcriptions.length - 2 == 1 ? '' : 'es'}',
-                                                style: theme.textTheme.bodySmall?.copyWith(
-                                                  color: theme.colorScheme.primary,
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ] else if (hasAudio) ...<Widget>[
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Contains audio/transcription',
-                                        style: theme.textTheme.bodySmall?.copyWith(
-                                          color: theme.colorScheme.primary,
-                                          fontStyle: FontStyle.italic,
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                                onTap: () => context.push('/note-detail', extra: note.id),
-                              ),
-                            );
-                          },
-                        ),
+                                        if (transcriptions.length > 2)
+                                          Text(
+                                            '+${transcriptions.length - 2} more match${transcriptions.length - 2 == 1 ? '' : 'es'}',
+                                            style: theme.textTheme.bodySmall?.copyWith(
+                                              color: theme.colorScheme.primary,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ] else if (hasAudio) ...<Widget>[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Contains audio/transcription',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.primary,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            onTap: () => context.push('/note-detail', extra: note.id),
+                          ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),

@@ -70,3 +70,14 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // AndroidX DataStore for modern data persistence
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    // KotlinX Serialization for JSON serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+    // Coroutines for async operations
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+}

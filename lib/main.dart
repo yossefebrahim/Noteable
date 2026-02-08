@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:noteable_app/services/platform/channels/widget_channel.dart';
 import 'package:provider/provider.dart';
 
 import 'core/theme/app_theme.dart';
@@ -10,6 +11,11 @@ import 'services/di/service_locator.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupServiceLocator();
+
+  // Initialize widget channel for widget communication
+  final widgetChannel = sl<WidgetChannel>();
+  await widgetChannel.init();
+
   runApp(const NoteableApp());
 }
 
