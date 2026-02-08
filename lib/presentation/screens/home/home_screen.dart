@@ -67,7 +67,35 @@ class HomeScreen extends StatelessWidget {
               child: CircularProgressIndicator(),
             ),
           ),
-      ],
+          body: vm.notes.isEmpty
+              ? const Center(child: Text('No notes yet. Tap "New note"'))
+              : ListView.separated(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: vm.notes.length,
+                  separatorBuilder: (_, index) => const SizedBox(height: 12),
+                  itemBuilder: (BuildContext context, int index) {
+                    final NoteEntity note = vm.notes[index];
+                    return Card(
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        title: Text(note.title.isEmpty ? 'Untitled' : note.title),
+                        subtitle: Text(note.content.isEmpty ? 'Start writing…' : note.content, maxLines: 2, overflow: TextOverflow.ellipsis),
+                        leading: IconButton(
+                          tooltip: note.isPinned ? 'Unpin' : 'Pin',
+                          onPressed: () => vm.togglePin(note.id),
+                          icon: Icon(note.isPinned ? Icons.push_pin : Icons.push_pin_outlined),
+                        ),
+                        onTap: () => context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes()),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: () => _confirmDelete(context, vm, note),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        );
+      },
     );
   }
 
