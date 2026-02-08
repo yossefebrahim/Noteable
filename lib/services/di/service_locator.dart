@@ -8,6 +8,8 @@ import 'package:noteable_app/domain/usecases/audio/create_audio_attachment_useca
 import 'package:noteable_app/domain/usecases/audio/transcribe_audio_usecase.dart';
 import 'package:noteable_app/domain/usecases/feature_usecases.dart';
 import 'package:noteable_app/presentation/providers/app_provider.dart';
+import 'package:noteable_app/presentation/providers/audio_player_provider.dart';
+import 'package:noteable_app/presentation/providers/audio_recorder_provider.dart';
 import 'package:noteable_app/presentation/providers/note_detail_view_model.dart';
 import 'package:noteable_app/presentation/providers/notes_view_model.dart';
 import 'package:noteable_app/services/audio/audio_player_service.dart';
@@ -71,5 +73,11 @@ Future<void> setupServiceLocator() async {
       getNotes: sl(),
       audioRepository: sl(),
     ),
+  );
+
+  // Audio providers
+  sl.registerLazySingleton<AudioRecorderProvider>(AudioRecorderProvider.new);
+  sl.registerFactory<AudioPlayerProvider>(
+    () => AudioPlayerProvider(audioPlayerService: sl()),
   );
 }
