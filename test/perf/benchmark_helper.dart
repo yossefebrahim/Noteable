@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:ui';
+
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Helper class for performance benchmarking operations.
@@ -58,12 +61,12 @@ class BenchmarkHelper {
   static Future<double> measureFrameRate(
     Future<void> Function() operation,
   ) async {
-    final frameTimes = <Duration>[];
+    final frameTimings = <FrameTiming>[];
     final completer = Completer<void>();
 
     // Record frame timings using the scheduler binding
-    void onFrame(Duration timestamp) {
-      frameTimes.add(timestamp);
+    void onFrame(List<FrameTiming> timings) {
+      frameTimings.addAll(timings);
       if (!completer.isCompleted) {
         SchedulerBinding.instance.scheduleFrame();
       }
@@ -80,15 +83,15 @@ class BenchmarkHelper {
       completer.complete();
     }
 
-    if (frameTimes.isEmpty) return 0.0;
+    if (frameTimings.isEmpty) return 0.0;
 
-    // Calculate FPS based on frame timestamps
-    final totalDuration = frameTimes.last.inMicroseconds -
-        frameTimes.first.inMicroseconds;
+    // Calculate FPS based on frame timings
+    final totalDuration = frameTimings.last.totalSpan.inMicroseconds -
+        frameTimings.first.totalSpan.inMicroseconds;
     if (totalDuration <= 0) return 0.0;
 
     final seconds = totalDuration / 1000000.0;
-    final fps = frameTimes.length / seconds;
+    final fps = frameTimings.length / seconds;
     return fps;
   }
 
