@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:noteable_app/domain/entities/note_entity.dart';
 import 'package:noteable_app/presentation/providers/notes_view_model.dart';
+import 'package:noteable_app/presentation/screens/home/widgets/empty_notes_state.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -68,7 +69,9 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           body: vm.notes.isEmpty
-              ? const Center(child: Text('No notes yet. Tap "New note"'))
+              ? EmptyNotesState(
+                  onCreateTap: () => context.push('/note-detail').then((_) => vm.refreshNotes()),
+                )
               : ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: vm.notes.length,
