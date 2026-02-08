@@ -16,7 +16,6 @@ class HomeScreen extends StatelessWidget {
             title: const Text('Notes'),
             actions: <Widget>[
               IconButton(onPressed: () => context.push('/search'), icon: const Icon(Icons.search_rounded)),
-              IconButton(onPressed: () => context.push('/templates'), icon: const Icon(Icons.dashboard_outlined)),
               IconButton(onPressed: () => context.push('/folders'), icon: const Icon(Icons.folder_outlined)),
               IconButton(onPressed: () => context.push('/settings'), icon: const Icon(Icons.settings_outlined)),
             ],
