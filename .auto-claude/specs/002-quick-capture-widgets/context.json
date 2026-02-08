@@ -1,0 +1,93 @@
+{
+  "files_to_modify": {
+    "flutter_app": [
+      "lib/main.dart",
+      "lib/services/di/service_locator.dart",
+      "lib/presentation/router/app_router.dart",
+      "ios/Runner/AppDelegate.swift",
+      "ios/Runner/Info.plist",
+      "android/app/src/main/AndroidManifest.xml",
+      "android/app/build.gradle.kts"
+    ],
+    "ios_widget": [
+      "ios/NoteableWidgets/NoteableWidgets.swift",
+      "ios/NoteableWidgets/NoteableWidgetsBundle.swift",
+      "ios/Runner/Info.plist",
+      "ios/Runner.xcodeproj/project.pbxproj"
+    ],
+    "android_widget": [
+      "android/app/src/main/kotlin/com/example/noteable_app/MainActivity.kt",
+      "android/app/src/main/AndroidManifest.xml",
+      "android/app/src/main/res/xml/quick_capture_widget_info.xml",
+      "android/app/src/main/kotlin/com/example/noteable_app/widget/QuickCaptureWidget.kt"
+    ]
+  },
+  "files_to_create": {
+    "flutter_app": [
+      "lib/services/platform/channels/widget_channel.dart",
+      "lib/services/platform/data_sync_service.dart"
+    ],
+    "ios_widget": [
+      "ios/NoteableWidgets/NoteableWidgets.swift",
+      "ios/NoteableWidgets/NoteableWidgetsBundle.swift",
+      "ios/NoteableWidgets/Widgets/QuickCaptureWidget.swift",
+      "ios/NoteableWidgets/Widgets/RecentNotesWidget.swift",
+      "ios/NoteableWidgets/Widgets/PinnedNotesWidget.swift",
+      "ios/NoteableWidgets/Shared/WidgetDataStore.swift",
+      "ios/NoteableWidgets/Shared/NoteDataModel.swift"
+    ],
+    "android_widget": [
+      "android/app/src/main/kotlin/com/example/noteable_app/widget/QuickCaptureWidget.kt",
+      "android/app/src/main/kotlin/com/example/noteable_app/widget/RecentNotesWidget.kt",
+      "android/app/src/main/kotlin/com/example/noteable_app/widget/PinnedNotesWidget.kt",
+      "android/app/src/main/kotlin/com/example/noteable_app/widget/WidgetDataStore.kt",
+      "android/app/src/main/kotlin/com/example/noteable_app/widget/NoteDataModel.kt",
+      "android/app/src/main/res/xml/quick_capture_widget_info.xml",
+      "android/app/src/main/res/xml/recent_notes_widget_info.xml",
+      "android/app/src/main/res/xml/pinned_notes_widget_info.xml",
+      "android/app/src/main/res/layout/quick_capture_widget.xml",
+      "android/app/src/main/res/layout/recent_notes_widget.xml",
+      "android/app/src/main/res/layout/pinned_notes_widget.xml"
+    ]
+  },
+  "files_to_reference": [
+    "lib/services/storage/isar_service.dart",
+    "lib/data/models/note_model.dart",
+    "lib/domain/entities/note.dart",
+    "lib/core/theme/app_theme.dart",
+    "lib/core/theme/app_colors.dart"
+  ],
+  "patterns": {
+    "data_access": "Isar database with NoteModel collection, accessed via IsarService",
+    "state_management": "Provider pattern with view models and use cases",
+    "navigation": "go_router with routes: /, /note-detail, /folders, /search, /settings",
+    "theme": "AppTheme with lightTheme and darkTheme, AppColors constants",
+    "note_entity": "Note has: id (String), title (String), content (String), isPinned (bool), folderId (String?), createdAt (DateTime), updatedAt (DateTime)"
+  },
+  "existing_implementations": {
+    "database": "Isar offline-first database with NoteModel collection, indexes on createdAt, isPinned, folderId",
+    "repository": "NoteRepositoryImpl with methods: getNotes(), createNote(), updateNote(), deleteNote(), togglePin()",
+    "storage_service": "IsarService in lib/services/storage/isar_service.dart",
+    "theme": "AppColors with light/dark variants: background, surface, textPrimary, textSecondary, accent, border, error, success, warning",
+    "deep_linking": "go_router with /note-detail route accepting noteId as extra parameter"
+  },
+  "widget_requirements": {
+    "ios": {
+      "widgetkit_extension": true,
+      "app_groups": "group.com.noteable.app",
+      "supported_sizes": ["small", "medium", "large"],
+      "timeline_reloads": true
+    },
+    "android": {
+      "app_widget_provider": true,
+      "min_sdk": "21",
+      "target_sdk": "34",
+      "preview_layout": true
+    },
+    "data_sharing": {
+      "method": "platform_channel + app_group_shared_storage",
+      "sync_trigger": "app background/foreground + widget refresh",
+      "offline_support": true
+    }
+  }
+}

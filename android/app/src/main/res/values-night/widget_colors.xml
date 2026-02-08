@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget Colors - Dark Theme -->
+    <!-- Matches AppColors from lib/core/theme/app_colors.dart -->
+
+    <!-- Background -->
+    <color name="widget_background">#FF000000</color>
+
+    <!-- Surface -->
+    <color name="widget_surface">#FF1C1C1E</color>
+
+    <!-- Text -->
+    <color name="widget_text_primary">#FFFFFFFF</color>
+    <color name="widget_text_secondary">#FF98989D</color>
+
+    <!-- Accent -->
+    <color name="widget_accent">#FF0A84FF</color>
+
+    <!-- Border -->
+    <color name="widget_border">#FF38383A</color>
+
+    <!-- Semantic Colors -->
+    <color name="widget_error">#FFFF453A</color>
+    <color name="widget_success">#FF32D74B</color>
+    <color name="widget_warning">#FFFF9F0A</color>
+
+</resources>

@@ -1,15 +1,15 @@
 {
   "active": true,
-  "spec": "008-performance-regression-testing-in-ci-cd",
+  "spec": "002-quick-capture-widgets",
   "state": "building",
   "subtasks": {
-    "completed": 10,
-    "total": 11,
+    "completed": 16,
+    "total": 17,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "CI/CD Integration",
+    "current": "Integration & Deep Linking",
     "id": null,
     "total": 4
   },
@@ -18,8 +18,8 @@
     "max": 1
   },
   "session": {
-    "number": 16,
-    "started_at": "2026-02-08T01:22:17.647010"
+    "number": 18,
+    "started_at": "2026-02-08T00:29:45.925227"
   },
-  "last_update": "2026-02-08T02:31:11.065562"
+  "last_update": "2026-02-08T01:38:44.680365"
 }
