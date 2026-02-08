@@ -9,6 +9,14 @@ class TemplateRepositoryImpl implements TemplateRepository {
     _initializeBuiltInTemplates();
   }
 
+  @override
+  Future<void> initialize() async {
+    // Templates are already initialized in the constructor
+    // This method is here to satisfy the BaseRepository interface
+    // If you need to re-initialize or reload templates, you can call:
+    // _initializeBuiltInTemplates();
+  }
+
   void _initializeBuiltInTemplates() {
     final List<TemplateEntity> builtInTemplates = <TemplateEntity>[
       TemplateEntity(

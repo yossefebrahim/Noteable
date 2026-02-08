@@ -8,9 +8,8 @@ import 'package:noteable_app/domain/usecases/template/import_export_templates_us
 import 'package:noteable_app/domain/usecases/template/update_template_usecase.dart';
 
 class TemplateViewModel extends ChangeNotifier {
-  TemplateViewModel({
-    required TemplateRepository templateRepository,
-  }) : _templateRepository = templateRepository;
+  TemplateViewModel({required TemplateRepository templateRepository})
+    : _templateRepository = templateRepository;
 
   final TemplateRepository _templateRepository;
 
@@ -37,36 +36,25 @@ class TemplateViewModel extends ChangeNotifier {
   }
 
   Future<void> createTemplate(TemplateEntity template) async {
-    final createTemplate = CreateTemplateUseCase(
-      templateRepository: _templateRepository,
-      template: template,
-    );
-    await createTemplate();
+    final createTemplate = CreateTemplateUseCase(templateRepository: _templateRepository);
+    await createTemplate(template);
     await refresh();
   }
 
   Future<void> updateTemplate(TemplateEntity template) async {
-    final updateTemplate = UpdateTemplateUseCase(
-      templateRepository: _templateRepository,
-      template: template,
-    );
-    await updateTemplate();
+    final updateTemplate = UpdateTemplateUseCase(templateRepository: _templateRepository);
+    await updateTemplate(template);
     await refresh();
   }
 
   Future<void> deleteTemplate(String id) async {
-    final deleteTemplate = DeleteTemplateUseCase(
-      templateRepository: _templateRepository,
-      templateId: id,
-    );
-    await deleteTemplate();
+    final deleteTemplate = DeleteTemplateUseCase(templateRepository: _templateRepository);
+    await deleteTemplate(id);
     await refresh();
   }
 
   Future<String> exportTemplates() async {
-    final importExport = ImportExportTemplatesUseCase(
-      templateRepository: _templateRepository,
-    );
+    final importExport = ImportExportTemplatesUseCase(templateRepository: _templateRepository);
     final result = await importExport.exportTemplates();
     if (result.isSuccess && result.data != null) {
       await refresh();
@@ -76,9 +64,7 @@ class TemplateViewModel extends ChangeNotifier {
   }
 
   Future<List<TemplateEntity>> importTemplates(String jsonString) async {
-    final importExport = ImportExportTemplatesUseCase(
-      templateRepository: _templateRepository,
-    );
+    final importExport = ImportExportTemplatesUseCase(templateRepository: _templateRepository);
     final result = await importExport.importTemplates(jsonString);
     if (result.isSuccess && result.data != null) {
       await refresh();

@@ -55,14 +55,13 @@ class AppRouter {
       ),
       GoRoute(
         path: '/templates',
-        pageBuilder: (BuildContext context, GoRouterState state) =>
-            _animatedPage(
-              state: state,
-              child: ChangeNotifierProvider<TemplateViewModel>(
-                create: (_) => sl<TemplateViewModel>()..load(),
-                child: const TemplatesScreen(),
-              ),
-            ),
+        pageBuilder: (BuildContext context, GoRouterState state) => _animatedPage(
+          state: state,
+          child: ChangeNotifierProvider<TemplateViewModel>(
+            create: (_) => sl<TemplateViewModel>()..load(),
+            child: const TemplatesScreen(),
+          ),
+        ),
       ),
       GoRoute(
         path: '/template-editor',
@@ -71,7 +70,7 @@ class AppRouter {
           child: ChangeNotifierProvider<TemplateViewModel>(
             create: (_) => sl<TemplateViewModel>()..load(),
             child: ChangeNotifierProvider<FolderViewModel>(
-              create: (_) => const FolderViewModel(),
+              create: (_) => FolderViewModel(),
               child: TemplateEditorScreen(templateId: state.extra as String?),
             ),
           ),

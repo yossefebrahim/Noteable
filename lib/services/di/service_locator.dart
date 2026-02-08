@@ -34,11 +34,21 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<RenameFolderUseCase>(() => RenameFolderUseCase(sl()));
   sl.registerLazySingleton<DeleteFolderUseCase>(() => DeleteFolderUseCase(sl()));
 
-  sl.registerLazySingleton<GetTemplatesUseCase>(() => GetTemplatesUseCase(sl()));
-  sl.registerLazySingleton<CreateTemplateUseCase>(() => CreateTemplateUseCase(sl()));
-  sl.registerLazySingleton<UpdateTemplateUseCase>(() => UpdateTemplateUseCase(sl()));
-  sl.registerLazySingleton<DeleteTemplateUseCase>(() => DeleteTemplateUseCase(sl()));
-  sl.registerLazySingleton<ImportExportTemplatesUseCase>(() => ImportExportTemplatesUseCase(sl()));
+  sl.registerLazySingleton<GetTemplatesUseCase>(
+    () => GetTemplatesUseCase(templateRepository: sl()),
+  );
+  sl.registerLazySingleton<CreateTemplateUseCase>(
+    () => CreateTemplateUseCase(templateRepository: sl()),
+  );
+  sl.registerLazySingleton<UpdateTemplateUseCase>(
+    () => UpdateTemplateUseCase(templateRepository: sl()),
+  );
+  sl.registerLazySingleton<DeleteTemplateUseCase>(
+    () => DeleteTemplateUseCase(templateRepository: sl()),
+  );
+  sl.registerLazySingleton<ImportExportTemplatesUseCase>(
+    () => ImportExportTemplatesUseCase(templateRepository: sl()),
+  );
   // Note: ApplyTemplateUseCase is NOT registered as a singleton because it requires
   // a TemplateEntity parameter at construction time. It's created directly when needed.
 
@@ -56,16 +66,8 @@ Future<void> setupServiceLocator() async {
   );
 
   sl.registerFactory<NoteEditorViewModel>(
-    () => NoteEditorViewModel(
-      createNote: sl(),
-      updateNote: sl(),
-      getNotes: sl(),
-    ),
+    () => NoteEditorViewModel(createNote: sl(), updateNote: sl(), getNotes: sl()),
   );
 
-  sl.registerFactory<TemplateViewModel>(
-    () => TemplateViewModel(
-      templateRepository: sl(),
-    )..load(),
-  );
+  sl.registerFactory<TemplateViewModel>(() => TemplateViewModel(templateRepository: sl())..load());
 }

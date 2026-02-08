@@ -4,17 +4,13 @@ import 'package:noteable_app/domain/repositories/template_repository.dart';
 
 class CreateTemplateUseCase {
   final TemplateRepository _templateRepository;
-  final TemplateEntity _template;
 
-  CreateTemplateUseCase({
-    required TemplateRepository templateRepository,
-    required TemplateEntity template,
-  })  : _templateRepository = templateRepository,
-        _template = template;
+  CreateTemplateUseCase({required TemplateRepository templateRepository})
+    : _templateRepository = templateRepository;
 
-  Future<Result<TemplateEntity>> call() async {
+  Future<Result<TemplateEntity>> call(TemplateEntity template) async {
     try {
-      final created = await _templateRepository.createTemplate(_template);
+      final created = await _templateRepository.createTemplate(template);
       return Result.success(created);
     } catch (e) {
       return Result.failure('Failed to create template: $e');
