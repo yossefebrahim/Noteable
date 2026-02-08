@@ -110,14 +110,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                           background: _buildSwipeBackground(
                             context,
-                            alignment: MainAxisAlignment.start,
+                            alignment: Alignment.centerLeft,
                             icon: note.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
                             color: Colors.amber,
                             label: note.isPinned ? 'Unpin' : 'Pin',
                           ),
                           secondaryBackground: _buildSwipeBackground(
                             context,
-                            alignment: MainAxisAlignment.end,
+                            alignment: Alignment.centerRight,
                             icon: Icons.delete_outline,
                             color: Colors.red,
                             label: 'Delete',
