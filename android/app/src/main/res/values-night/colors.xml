@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget Colors (Dark Theme) -->
+    <color name="widget_background">#FF000000</color>
+    <color name="widget_surface">#FF1C1C1E</color>
+    <color name="widget_text_primary">#FFFFFFFF</color>
+    <color name="widget_text_secondary">#FF98989D</color>
+    <color name="widget_accent">#FF0A84FF</color>
+</resources>
