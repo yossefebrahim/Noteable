@@ -68,6 +68,7 @@ class HomeScreen extends StatelessWidget {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        duration: const Duration(seconds: 4),
         content: Text('$noteTitle deleted'),
         action: SnackBarAction(
           label: 'Undo',
