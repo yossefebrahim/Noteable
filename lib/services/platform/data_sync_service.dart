@@ -14,7 +14,7 @@ import '../../data/models/note_model.dart';
 class DataSyncService {
   DataSyncService();
 
-  static const String _appGroupIdentifier = 'group.com.example.noteable';
+  static const String _appGroupIdentifier = 'group.com.noteable.app';
   static const String _notesFileName = 'widget_notes.json';
   static const String _pinnedNotesFileName = 'widget_pinned_notes.json';
   static const MethodChannel _widgetChannel = MethodChannel('com.example.noteable/widgets');
@@ -28,7 +28,7 @@ class DataSyncService {
     try {
       if (Platform.isIOS) {
         // iOS: Use app group container
-        final appGroupDir = await getApplicationGroupDirectory();
+        final appGroupDir = await getApplicationGroupDirectory(identifier: _appGroupIdentifier);
         _appGroupDirectory = appGroupDir;
       } else if (Platform.isAndroid) {
         // Android: Use application documents directory

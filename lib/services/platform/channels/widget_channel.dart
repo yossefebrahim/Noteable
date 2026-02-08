@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:get_it/get_it.dart';
 
 import '../../../data/models/note_model.dart';
+import '../data_sync_service.dart';
 
 class WidgetChannel {
   WidgetChannel();
@@ -10,6 +12,7 @@ class WidgetChannel {
   static const EventChannel _updateChannel = EventChannel('com.example.noteable/widget_updates');
 
   Stream<Map<String, dynamic>>? _widgetUpdateStream;
+  DataSyncService? _dataSyncService;
 
   /// Initialize the widget channel and set up method handlers
   Future<void> init() async {
@@ -17,6 +20,10 @@ class WidgetChannel {
     _widgetUpdateStream = _updateChannel.receiveBroadcastStream().map(
       (dynamic event) => Map<String, dynamic>.from(event as Map),
     );
+
+    // Get DataSyncService from service locator
+    _dataSyncService = sl<DataSyncService>();
+    await _dataSyncService!.init();
   }
 
   /// Stream of widget update requests from native side
@@ -49,8 +56,8 @@ class WidgetChannel {
   Future<Map<String, dynamic>> _getNotes(Map<String, dynamic>? args) async {
     try {
       final limit = args?['limit'] as int? ?? 10;
-      // This will be implemented when connected to the data sync service
-      return {'status': 'success', 'notes': <Map<String, dynamic>>[]};
+      final notes = await _dataSyncService!.getNotes(limit: limit);
+      return {'status': 'success', 'notes': notes};
     } catch (e) {
       return {'status': 'error', 'message': e.toString()};
     }
@@ -70,16 +77,8 @@ class WidgetChannel {
         return {'status': 'error', 'message': 'Note cannot be empty'};
       }
 
-      // This will be implemented when connected to the data sync service
-      return {
-        'status': 'success',
-        'note': <String, dynamic>{
-          'id': 0,
-          'title': title,
-          'content': content,
-          'createdAt': DateTime.now().toIso8601String(),
-        },
-      };
+      final note = await _dataSyncService!.createNote(title: title, content: content);
+      return {'status': 'success', 'note': note};
     } catch (e) {
       return {'status': 'error', 'message': e.toString()};
     }
@@ -89,8 +88,8 @@ class WidgetChannel {
   Future<Map<String, dynamic>> _getPinnedNotes(Map<String, dynamic>? args) async {
     try {
       final limit = args?['limit'] as int? ?? 10;
-      // This will be implemented when connected to the data sync service
-      return {'status': 'success', 'notes': <Map<String, dynamic>>[]};
+      final notes = await _dataSyncService!.getPinnedNotes(limit: limit);
+      return {'status': 'success', 'notes': notes};
     } catch (e) {
       return {'status': 'error', 'message': e.toString()};
     }
@@ -100,8 +99,8 @@ class WidgetChannel {
   Future<Map<String, dynamic>> _getRecentNotes(Map<String, dynamic>? args) async {
     try {
       final limit = args?['limit'] as int? ?? 3;
-      // This will be implemented when connected to the data sync service
-      return {'status': 'success', 'notes': <Map<String, dynamic>>[]};
+      final notes = await _dataSyncService!.getRecentNotes(limit: limit);
+      return {'status': 'success', 'notes': notes};
     } catch (e) {
       return {'status': 'error', 'message': e.toString()};
     }

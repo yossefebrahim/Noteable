@@ -88,10 +88,10 @@ class QuickCaptureWidget : AppWidgetProvider() {
     }
 
     private fun createCaptureIntent(context: Context): Intent {
-        // Deep link to quick capture in the Flutter app
+        // Deep link to note detail in the Flutter app
         return Intent(
             Intent.ACTION_VIEW,
-            Uri.parse("noteable://quick-capture"),
+            Uri.parse("noteable://note-detail"),
             context,
             MainActivity::class.java
         )
