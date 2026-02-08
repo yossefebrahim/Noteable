@@ -35,6 +35,9 @@ class _EmptyStateState extends State<EmptyState> with TickerProviderStateMixin {
   late AnimationController _tipFadeController;
   late Animation<double> _tipFadeAnimation;
 
+  // Action button micro-interaction state
+  double _actionScale = 1;
+
   @override
   void initState() {
     super.initState();
@@ -120,7 +123,20 @@ class _EmptyStateState extends State<EmptyState> with TickerProviderStateMixin {
                   child: _buildTip(context),
                 ),
               ],
-              if (widget.action != null) ...[const SizedBox(height: 16), widget.action!],
+              if (widget.action != null)
+                const SizedBox(height: 16),
+              if (widget.action != null)
+                GestureDetector(
+                  onTapDown: (_) => setState(() => _actionScale = 0.98),
+                  onTapUp: (_) => setState(() => _actionScale = 1),
+                  onTapCancel: () => setState(() => _actionScale = 1),
+                  child: AnimatedScale(
+                    scale: _actionScale,
+                    duration: const Duration(milliseconds: 100),
+                    curve: Curves.easeInOut,
+                    child: widget.action!,
+                  ),
+                ),
             ],
           ),
         ),
