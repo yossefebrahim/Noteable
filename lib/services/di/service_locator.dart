@@ -10,6 +10,7 @@ import 'package:noteable_app/domain/usecases/export/export_folder_usecase.dart';
 import 'package:noteable_app/domain/usecases/export/export_all_notes_usecase.dart';
 import 'package:noteable_app/domain/usecases/export/share_note_usecase.dart';
 import 'package:noteable_app/presentation/providers/app_provider.dart';
+import 'package:noteable_app/presentation/providers/export_view_model.dart';
 import 'package:noteable_app/presentation/providers/note_detail_view_model.dart';
 import 'package:noteable_app/presentation/providers/notes_view_model.dart';
 
@@ -64,6 +65,12 @@ Future<void> setupServiceLocator() async {
       createNote: sl(),
       updateNote: sl(),
       getNotes: sl(),
+    ),
+  );
+
+  sl.registerFactory<ExportViewModel>(
+    () => ExportViewModel(
+      noteRepository: sl(),
     ),
   );
 }
