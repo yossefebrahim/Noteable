@@ -33,3 +33,53 @@ jobs:
 
       - name: Build iOS (no codesign)
         run: flutter build ios --debug --no-codesign
+
+  performance-benchmark:
+    runs-on: macos-latest
+    # Run performance tests in parallel with main tests
+    # Don't fail the entire build if performance tests have issues
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
+      - name: Run performance benchmarks
+        run: |
+          # Create output directory for metrics
+          mkdir -p test_results
+
+          # Run performance tests
+          flutter test test/perf --no-pub --reporter=json > test_results/perf_test_raw.json || true
+
+      - name: Process benchmark results
+        run: |
+          # Parse and format results for GitHub output
+          if [ -f test_results/perf_test_raw.json ]; then
+            echo "## Performance Test Results" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            cat test_results/perf_test_raw.json | jq -r '.result | select(.testID | contains("perf")) | "**\(.testID):** \(.status)"' >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "No performance tests found"
+          else
+            echo "No performance test results found" | tee -a $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-test-results
+          path: test_results/
+          retention-days: 30
+

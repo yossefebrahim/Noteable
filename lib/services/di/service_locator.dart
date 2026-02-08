@@ -75,3 +75,7 @@ Future<void> setupServiceLocator() async {
 
   sl.registerFactory<TemplateViewModel>(() => TemplateViewModel(templateRepository: sl())..load());
 }
+
+Future<void> resetServiceLocator() async {
+  await sl.reset();
+}
