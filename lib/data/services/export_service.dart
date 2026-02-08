@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../models/note_model.dart';
 
 /// Enum representing supported export formats
@@ -139,9 +141,24 @@ class ExportService {
   }
 
   /// Convert note to JSON format
+  ///
+  /// Creates a JSON document suitable for backup/migration with:
+  /// - All note fields including optional ones
+  /// - Proper JSON encoding using dart:convert
+  /// - ISO 8601 formatted dates
+  /// - Handles null values for optional fields (folderId, updatedAt)
   String _convertToJson(NoteModel note) {
-    // JSON export will be fully implemented in subtask-2-4
-    return '{"id":${note.id},"title":"${note.title}","content":"${note.content}","createdAt":"${note.createdAt.toIso8601String()}","isPinned":${note.isPinned}}';
+    final jsonData = {
+      'id': note.id,
+      'title': note.title,
+      'content': note.content,
+      'isPinned': note.isPinned,
+      'folderId': note.folderId,
+      'createdAt': note.createdAt.toIso8601String(),
+      'updatedAt': note.updatedAt?.toIso8601String(),
+    };
+
+    return jsonEncode(jsonData);
   }
 
   /// Convert note to shareable text format
