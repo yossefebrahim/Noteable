@@ -17,8 +17,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = -1;
 
-  void _handleKeyEvent(KeyEvent event, NotesViewModel vm, BuildContext context) {
-    if (event is! KeyDownEvent) return;
+  KeyEventResult _handleKeyEvent(KeyEvent event, NotesViewModel vm, BuildContext context) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
     if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
       setState(() {
@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _selectedIndex = 0; // Wrap to top
         }
       });
+      return KeyEventResult.handled;
     } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
       setState(() {
         if (_selectedIndex > 0) {
@@ -36,10 +37,13 @@ class _HomeScreenState extends State<HomeScreen> {
           _selectedIndex = vm.notes.length - 1; // Wrap to bottom
         }
       });
+      return KeyEventResult.handled;
     } else if (event.logicalKey == LogicalKeyboardKey.enter && _selectedIndex >= 0) {
       final note = vm.notes[_selectedIndex];
       context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes());
+      return KeyEventResult.handled;
     }
+    return KeyEventResult.ignored;
   }
 
   @override
@@ -316,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildSwipeBackground(
     BuildContext context, {
-    required MainAxisAlignment alignment,
+    required Alignment alignment,
     required IconData icon,
     required Color color,
     required String label,
@@ -329,7 +333,9 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
-        mainAxisAlignment: alignment,
+        mainAxisAlignment: (alignment == Alignment.centerLeft)
+            ? MainAxisAlignment.start
+            : MainAxisAlignment.end,
         children: <Widget>[
           Icon(icon, color: Colors.white),
           const SizedBox(width: 8),
