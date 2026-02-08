@@ -18,6 +18,7 @@ void main() {
       renameFolder: RenameFolderUseCase(repo),
       deleteFolder: DeleteFolderUseCase(repo),
       searchNotes: SearchNotesUseCase(repo),
+      restoreNote: RestoreNoteUseCase(repo),
     );
   });
 

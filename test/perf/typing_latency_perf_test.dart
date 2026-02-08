@@ -7,16 +7,47 @@ import 'package:noteable_app/presentation/providers/note_detail_view_model.dart'
 
 import 'benchmark_helper.dart';
 
+import 'package:noteable_app/domain/entities/audio_attachment.dart';
+import 'package:noteable_app/domain/repositories/audio_repository.dart';
+
+class FakeAudioRepository implements AudioRepository {
+  @override
+  Future<void> initialize() async {}
+
+  @override
+  Future<List<AudioAttachment>> getAudioAttachments() async => [];
+
+  @override
+  Future<AudioAttachment?> getAudioAttachmentById(String id) async => null;
+
+  @override
+  Future<List<AudioAttachment>> getAudioAttachmentsByNoteId(String noteId) async => [];
+
+  @override
+  Future<AudioAttachment> createAudioAttachment(AudioAttachment audioAttachment) async =>
+      audioAttachment;
+
+  @override
+  Future<AudioAttachment> updateAudioAttachment(AudioAttachment audioAttachment) async =>
+      audioAttachment;
+
+  @override
+  Future<void> deleteAudioAttachment(String id) async {}
+}
+
 void main() {
   late InMemoryNotesFeatureRepository repo;
+  late FakeAudioRepository audioRepo;
   late NoteEditorViewModel viewModel;
 
   setUp(() {
     repo = InMemoryNotesFeatureRepository();
+    audioRepo = FakeAudioRepository();
     viewModel = NoteEditorViewModel(
       createNote: CreateNoteUseCase(repo),
       updateNote: UpdateNoteUseCase(repo),
       getNotes: GetNotesUseCase(repo),
+      audioRepository: audioRepo,
     );
   });
 
@@ -48,8 +79,7 @@ void main() {
       expect(viewModel.note?.content, contains('a'));
     });
 
-    testWidgets('multiple keystrokes save latency must be under 500ms',
-        (tester) async {
+    testWidgets('multiple keystrokes save latency must be under 500ms', (tester) async {
       await viewModel.init();
 
       // Simulate rapid typing (multiple keystrokes)
@@ -74,8 +104,7 @@ void main() {
       );
     });
 
-    testWidgets('typing latency average (5 runs) must be under 500ms',
-        (tester) async {
+    testWidgets('typing latency average (5 runs) must be under 500ms', (tester) async {
       // Measure average typing latency across multiple runs
       final avgLatency = await BenchmarkHelper.recordAverageTime(
         () async {
@@ -85,6 +114,7 @@ void main() {
             createNote: CreateNoteUseCase(repo),
             updateNote: UpdateNoteUseCase(repo),
             getNotes: GetNotesUseCase(repo),
+            audioRepository: audioRepo,
           );
 
           await viewModel.init();
@@ -162,6 +192,7 @@ void main() {
         createNote: CreateNoteUseCase(repo),
         updateNote: UpdateNoteUseCase(repo),
         getNotes: GetNotesUseCase(repo),
+        audioRepository: audioRepo,
       );
       await viewModel.init(noteId: existingNote.id);
 

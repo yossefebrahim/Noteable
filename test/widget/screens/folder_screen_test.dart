@@ -18,6 +18,7 @@ Future<NotesViewModel> _buildVm() async {
     renameFolder: RenameFolderUseCase(repo),
     deleteFolder: DeleteFolderUseCase(repo),
     searchNotes: SearchNotesUseCase(repo),
+    restoreNote: RestoreNoteUseCase(repo),
   );
   await vm.load();
   return vm;

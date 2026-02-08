@@ -20,6 +20,7 @@ Future<NotesViewModel> _buildVm() async {
     renameFolder: RenameFolderUseCase(repo),
     deleteFolder: DeleteFolderUseCase(repo),
     searchNotes: SearchNotesUseCase(repo),
+    restoreNote: RestoreNoteUseCase(repo),
   );
   await vm.load();
   return vm;
@@ -28,7 +29,9 @@ Future<NotesViewModel> _buildVm() async {
 void main() {
   testWidgets('SearchScreen filters notes', (tester) async {
     final vm = await _buildVm();
-    final router = GoRouter(routes: [GoRoute(path: '/', builder: (_, __) => const SearchScreen())]);
+    final router = GoRouter(
+      routes: [GoRoute(path: '/', builder: (_, __) => const SearchScreen())],
+    );
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
         value: vm,
