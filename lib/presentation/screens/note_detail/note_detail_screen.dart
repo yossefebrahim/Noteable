@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/note_detail_view_model.dart';
 import '../../providers/notes_view_model.dart';
 import '../../widgets/app_button.dart';
-import '../../widgets/app_text_field.dart';
+import '../../widgets/debounced_text_field.dart';
 
 class NoteDetailScreen extends StatefulWidget {
   const NoteDetailScreen({super.key, this.noteId});
@@ -85,14 +85,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: <Widget>[
-            AppTextField(
+            DebouncedTextField(
               controller: _titleController,
               hintText: 'Note title',
               onChanged: (String value) => context.read<NoteEditorViewModel>().updateDraft(title: value),
             ),
             const SizedBox(height: 12),
             Expanded(
-              child: AppTextField(
+              child: DebouncedTextField(
                 controller: _contentController,
                 hintText: 'Start writing...',
                 maxLines: null,

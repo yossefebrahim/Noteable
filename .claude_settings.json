@@ -1,0 +1,39 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read(./**)",
+      "Write(./**)",
+      "Edit(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Read(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/006-optimized-typing-performance/**)",
+      "Write(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/006-optimized-typing-performance/**)",
+      "Edit(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/006-optimized-typing-performance/**)",
+      "Glob(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/006-optimized-typing-performance/**)",
+      "Grep(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/006-optimized-typing-performance/**)",
+      "Read(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/006-optimized-typing-performance/.auto-claude/specs/006-optimized-typing-performance/**)",
+      "Write(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/006-optimized-typing-performance/.auto-claude/specs/006-optimized-typing-performance/**)",
+      "Edit(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/worktrees/tasks/006-optimized-typing-performance/.auto-claude/specs/006-optimized-typing-performance/**)",
+      "Read(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/**)",
+      "Write(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/**)",
+      "Edit(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/**)",
+      "Glob(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/**)",
+      "Grep(/Users/yossefebrahim/Jarvis-Work/Noteable/.auto-claude/**)",
+      "Bash(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__context7__resolve-library-id(*)",
+      "mcp__context7__get-library-docs(*)",
+      "mcp__graphiti-memory__search_nodes(*)",
+      "mcp__graphiti-memory__search_facts(*)",
+      "mcp__graphiti-memory__add_episode(*)",
+      "mcp__graphiti-memory__get_episodes(*)",
+      "mcp__graphiti-memory__get_entity_edge(*)"
+    ]
+  }
+}

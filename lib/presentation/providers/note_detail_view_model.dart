@@ -41,13 +41,12 @@ class NoteEditorViewModel extends ChangeNotifier {
       isPinned: isPinned ?? _note!.isPinned,
       updatedAt: DateTime.now(),
     );
-    notifyListeners();
     _scheduleAutoSave();
   }
 
   void _scheduleAutoSave() {
     _autoSaveTimer?.cancel();
-    _autoSaveTimer = Timer(const Duration(milliseconds: 700), saveNow);
+    _autoSaveTimer = Timer(const Duration(milliseconds: 300), saveNow);
   }
 
   Future<void> saveNow() async {
