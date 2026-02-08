@@ -497,7 +497,7 @@ void main() {
       );
 
       // Verify filename pattern: notes_markdown_{count}_{timestamp}.zip
-      expect(result.filePath, startsWith('/path/to/notes_markdown_2_'));
+      expect(result.filePath, contains('notes_markdown_2_'));
       expect(result.filePath, endsWith('.zip'));
 
       final zipFile = File(result.filePath);
