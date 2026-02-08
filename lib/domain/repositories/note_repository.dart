@@ -15,4 +15,10 @@ abstract interface class NoteRepository implements BaseRepository {
   Future<Note> togglePinNote(String id);
 
   Future<List<Note>> searchNotes(String query);
+
+  Future<Note> softDeleteNote(String id);
+
+  Future<Note> restoreNote(String id);
+
+  Future<Note?> getDeletedNote(String id);
 }
