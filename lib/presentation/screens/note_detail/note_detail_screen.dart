@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:noteable_app/domain/entities/template_entity.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/note_detail_view_model.dart';
 import '../../providers/notes_view_model.dart';
+import '../../providers/template_view_model.dart';
 import '../../widgets/app_button.dart';
-import '../../widgets/app_text_field.dart';
+import '../../widgets/debounced_text_field.dart';
 
 class NoteDetailScreen extends StatefulWidget {
   const NoteDetailScreen({super.key, this.noteId});
@@ -81,19 +83,25 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isEditing = context.select<NoteEditorViewModel, bool>((NoteEditorViewModel vm) => vm.hasNote);
-    final bool isPinned = context.select<NoteEditorViewModel, bool>((NoteEditorViewModel vm) => vm.note?.isPinned ?? false);
-    final bool isSaving = context.select<NoteEditorViewModel, bool>((NoteEditorViewModel vm) => vm.isSaving);
+    final bool isEditing = context.select<NoteEditorViewModel, bool>(
+      (NoteEditorViewModel vm) => vm.hasNote,
+    );
+    final bool isPinned = context.select<NoteEditorViewModel, bool>(
+      (NoteEditorViewModel vm) => vm.note?.isPinned ?? false,
+    );
+    final bool isSaving = context.select<NoteEditorViewModel, bool>(
+      (NoteEditorViewModel vm) => vm.isSaving,
+    );
 
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
         const SingleActivator(LogicalKeyboardKey.keyS, control: true, meta: true): _handleSave,
-        const SingleActivator(LogicalKeyboardKey.digit1, control: true, meta: true):
-            () => _applyFormatting('# '),
-        const SingleActivator(LogicalKeyboardKey.digit2, control: true, meta: true):
-            () => _applyFormatting('**'),
-        const SingleActivator(LogicalKeyboardKey.digit3, control: true, meta: true):
-            () => _applyFormatting('*'),
+        const SingleActivator(LogicalKeyboardKey.digit1, control: true, meta: true): () =>
+            _applyFormatting('# '),
+        const SingleActivator(LogicalKeyboardKey.digit2, control: true, meta: true): () =>
+            _applyFormatting('**'),
+        const SingleActivator(LogicalKeyboardKey.digit3, control: true, meta: true): () =>
+            _applyFormatting('*'),
       },
       child: Focus(
         autofocus: true,
@@ -112,11 +120,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                child: AppButton(
-                  label: 'Save',
-                  isLoading: isSaving,
-                  onPressed: _handleSave,
-                ),
+                child: AppButton(label: 'Save', isLoading: isSaving, onPressed: _handleSave),
               ),
             ],
           ),
@@ -124,25 +128,90 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: <Widget>[
-                AppTextField(
+                DebouncedTextField(
                   controller: _titleController,
                   hintText: 'Note title',
-                  onChanged: (String value) => context.read<NoteEditorViewModel>().updateDraft(title: value),
+                  onChanged: (String value) =>
+                      context.read<NoteEditorViewModel>().updateDraft(title: value),
                 ),
                 const SizedBox(height: 12),
                 Expanded(
-                  child: AppTextField(
+                  child: DebouncedTextField(
                     controller: _contentController,
                     hintText: 'Start writing...',
                     maxLines: null,
-                    onChanged: (String value) => context.read<NoteEditorViewModel>().updateDraft(content: value),
+                    onChanged: (String value) =>
+                        context.read<NoteEditorViewModel>().updateDraft(content: value),
                   ),
                 ),
               ],
             ),
           ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => _showTemplateDialog(context),
+            child: const Icon(Icons.description_outlined),
+          ),
         ),
       ),
     );
+  }
+
+  Future<void> _showTemplateDialog(BuildContext context) async {
+    final TemplateEntity? selected = await showDialog<TemplateEntity>(
+      context: context,
+      builder: (BuildContext context) {
+        return Consumer<TemplateViewModel>(
+          builder: (BuildContext context, TemplateViewModel vm, _) {
+            final List<TemplateEntity> templates = vm.templates;
+            if (templates.isEmpty) {
+              return AlertDialog(
+                title: const Text('Use Template'),
+                content: const Text('No templates available. Create templates first.'),
+                actions: <Widget>[
+                  TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+                ],
+              );
+            }
+            return AlertDialog(
+              title: const Text('Use Template'),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: templates.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final TemplateEntity template = templates[index];
+                    return ListTile(
+                      title: Text(template.name),
+                      subtitle: Text(template.title),
+                      leading: Icon(
+                        template.isBuiltIn ? Icons.lock_outlined : Icons.description_outlined,
+                      ),
+                      onTap: () => Navigator.pop(context, template),
+                    );
+                  },
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+              ],
+            );
+          },
+        );
+      },
+    );
+    if (selected != null) {
+      await _applyTemplate(selected);
+    }
+  }
+
+  Future<void> _applyTemplate(TemplateEntity template) async {
+    final NoteEditorViewModel vm = context.read<NoteEditorViewModel>();
+    await vm.applyTemplate(template);
+    final note = vm.note;
+    if (note != null) {
+      _titleController.text = note.title;
+      _contentController.text = note.content;
+    }
   }
 }

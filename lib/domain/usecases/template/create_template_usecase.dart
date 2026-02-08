@@ -1,0 +1,19 @@
+import 'package:noteable_app/domain/common/result.dart';
+import 'package:noteable_app/domain/entities/template_entity.dart';
+import 'package:noteable_app/domain/repositories/template_repository.dart';
+
+class CreateTemplateUseCase {
+  final TemplateRepository _templateRepository;
+
+  CreateTemplateUseCase({required TemplateRepository templateRepository})
+    : _templateRepository = templateRepository;
+
+  Future<Result<TemplateEntity>> call(TemplateEntity template) async {
+    try {
+      final created = await _templateRepository.createTemplate(template);
+      return Result.success(created);
+    } catch (e) {
+      return Result.failure('Failed to create template: $e');
+    }
+  }
+}

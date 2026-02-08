@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:noteable_app/domain/entities/note_entity.dart';
 import 'package:noteable_app/presentation/providers/notes_view_model.dart';
+import 'package:noteable_app/presentation/screens/home/widgets/empty_notes_state.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,7 +18,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = -1;
 
-  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event, NotesViewModel vm, BuildContext context) {
+  KeyEventResult _handleKeyEvent(
+    FocusNode node,
+    KeyEvent event,
+    NotesViewModel vm,
+    BuildContext context,
+  ) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
     if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
@@ -48,124 +54,170 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<NotesViewModel>(
-      builder: (BuildContext context, NotesViewModel vm, _) {
-        return CallbackShortcuts(
-          bindings: <ShortcutActivator, VoidCallback>{
-            const SingleActivator(LogicalKeyboardKey.keyN, control: true, meta: true):
-                () => context.push('/note-detail').then((_) => vm.refreshNotes()),
-            const SingleActivator(LogicalKeyboardKey.keyF, control: true, meta: true):
-                () => context.push('/search'),
-            const SingleActivator(LogicalKeyboardKey.slash, shift: true, control: true, meta: true):
-                () => context.push('/keyboard-shortcuts'),
-          },
-          child: Focus(
-            autofocus: true,
-            onKeyEvent: (FocusNode node, KeyEvent event) => _handleKeyEvent(node, event, vm, context),
-            child: Scaffold(
-              appBar: AppBar(
-                title: const Text('Notes'),
-                actions: <Widget>[
-                  IconButton(
-                    onPressed: () => context.push('/keyboard-shortcuts'),
-                    icon: const Icon(Icons.help_outline),
-                    tooltip: 'Keyboard shortcuts',
+    final bool isLoading = context.select<NotesViewModel, bool>(
+      (NotesViewModel vm) => vm.isLoading,
+    );
+
+    return Stack(
+      children: <Widget>[
+        Consumer<NotesViewModel>(
+          builder: (BuildContext context, NotesViewModel vm, _) {
+            return CallbackShortcuts(
+              bindings: <ShortcutActivator, VoidCallback>{
+                const SingleActivator(LogicalKeyboardKey.keyN, control: true, meta: true): () =>
+                    context.push('/note-detail').then((_) => vm.refreshNotes()),
+                const SingleActivator(LogicalKeyboardKey.keyF, control: true, meta: true): () =>
+                    context.push('/search'),
+                const SingleActivator(
+                  LogicalKeyboardKey.slash,
+                  shift: true,
+                  control: true,
+                  meta: true,
+                ): () =>
+                    context.push('/keyboard-shortcuts'),
+              },
+              child: Focus(
+                autofocus: true,
+                onKeyEvent: (FocusNode node, KeyEvent event) =>
+                    _handleKeyEvent(node, event, vm, context),
+                child: Scaffold(
+                  appBar: AppBar(
+                    title: const Text('Notes'),
+                    actions: <Widget>[
+                      IconButton(
+                        onPressed: () => context.push('/keyboard-shortcuts'),
+                        icon: const Icon(Icons.help_outline),
+                        tooltip: 'Keyboard shortcuts',
+                      ),
+                      IconButton(
+                        onPressed: () => context.push('/search'),
+                        icon: const Icon(Icons.search_rounded),
+                      ),
+                      IconButton(
+                        onPressed: () => context.push('/templates'),
+                        icon: const Icon(Icons.dashboard_outlined),
+                      ),
+                      IconButton(
+                        onPressed: () => context.push('/folders'),
+                        icon: const Icon(Icons.folder_outlined),
+                      ),
+                      IconButton(
+                        onPressed: () => context.push('/settings'),
+                        icon: const Icon(Icons.settings_outlined),
+                      ),
+                    ],
                   ),
-                  IconButton(onPressed: () => context.push('/search'), icon: const Icon(Icons.search_rounded)),
-                  IconButton(onPressed: () => context.push('/folders'), icon: const Icon(Icons.folder_outlined)),
-                  IconButton(onPressed: () => context.push('/settings'), icon: const Icon(Icons.settings_outlined)),
-                ],
-              ),
-              floatingActionButton: FloatingActionButton.extended(
-                onPressed: () => context.push('/note-detail').then((_) => vm.refreshNotes()),
-                icon: const Icon(Icons.add),
-                label: const Text('New note'),
-              ),
-              body: vm.notes.isEmpty
-                  ? const Center(child: Text('No notes yet. Tap "New note"'))
-                  : ListView.separated(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: vm.notes.length,
-                      separatorBuilder: (_, index) => const SizedBox(height: 12),
-                      itemBuilder: (BuildContext context, int index) {
-                        final NoteEntity note = vm.notes[index];
-                        final bool isSelected = _selectedIndex == index;
-                        return Dismissible(
-                          key: Key(note.id),
-                          direction: DismissDirection.horizontal,
-                          onDismissed: (DismissDirection direction) {
-                            if (direction == DismissDirection.endToStart) {
-                              // Swipe left (end to start) - delete
-                              _confirmDelete(context, vm, note);
-                            } else if (direction == DismissDirection.startToEnd) {
-                              // Swipe right (start to end) - toggle pin
-                              vm.togglePin(note.id);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(note.isPinned ? 'Note unpinned' : 'Note pinned'),
-                                  duration: const Duration(seconds: 2),
-                                ),
-                              );
-                            }
-                          },
-                          background: _buildSwipeBackground(
-                            context,
-                            alignment: Alignment.centerLeft,
-                            icon: note.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
-                            color: Colors.amber,
-                            label: note.isPinned ? 'Unpin' : 'Pin',
-                          ),
-                          secondaryBackground: _buildSwipeBackground(
-                            context,
-                            alignment: Alignment.centerRight,
-                            icon: Icons.delete_outline,
-                            color: Colors.red,
-                            label: 'Delete',
-                          ),
-                          child: GestureDetector(
-                            onForcePressStart: Platform.isIOS
-                                ? (_) {
-                                    _showNotePreview(context, note, vm);
-                                  }
-                                : null,
-                            onForcePressEnd: Platform.isIOS ? (_) {} : null,
-                            child: Card(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primaryContainer
-                                  : null,
-                              elevation: isSelected ? 4 : 1,
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                title: Text(note.title.isEmpty ? 'Untitled' : note.title),
-                                subtitle: Text(
-                                  note.content.isEmpty ? 'Start writing…' : note.content,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                leading: IconButton(
-                                  tooltip: note.isPinned ? 'Unpin' : 'Pin',
-                                  onPressed: () => vm.togglePin(note.id),
-                                  icon: Text(note.isPinned ? '📌' : '📍', style: const TextStyle(fontSize: 18)),
-                                ),
-                                onTap: () {
-                                  setState(() => _selectedIndex = index);
-                                  context.push('/note-detail', extra: note.id).then((_) => vm.refreshNotes());
-                                },
-                                onLongPress: () => _showContextMenu(context, note, vm),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.delete_outline),
-                                  onPressed: () => _confirmDelete(context, vm, note),
+                  floatingActionButton: FloatingActionButton.extended(
+                    onPressed: () => context.push('/note-detail').then((_) => vm.refreshNotes()),
+                    icon: const Icon(Icons.add),
+                    label: const Text('New note'),
+                  ),
+                  body: vm.notes.isEmpty
+                      ? EmptyNotesState(
+                          onCreateTap: () =>
+                              context.push('/note-detail').then((_) => vm.refreshNotes()),
+                        )
+                      : ListView.separated(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: vm.notes.length,
+                          separatorBuilder: (_, index) => const SizedBox(height: 12),
+                          itemBuilder: (BuildContext context, int index) {
+                            final NoteEntity note = vm.notes[index];
+                            final bool isSelected = _selectedIndex == index;
+                            return Dismissible(
+                              key: Key(note.id),
+                              direction: DismissDirection.horizontal,
+                              onDismissed: (DismissDirection direction) {
+                                if (direction == DismissDirection.endToStart) {
+                                  // Swipe left (end to start) - delete
+                                  _confirmDelete(context, vm, note);
+                                } else if (direction == DismissDirection.startToEnd) {
+                                  // Swipe right (start to end) - toggle pin
+                                  vm.togglePin(note.id);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        note.isPinned ? 'Note unpinned' : 'Note pinned',
+                                      ),
+                                      duration: const Duration(seconds: 2),
+                                    ),
+                                  );
+                                }
+                              },
+                              background: _buildSwipeBackground(
+                                context,
+                                alignment: Alignment.centerLeft,
+                                icon: note.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
+                                color: Colors.amber,
+                                label: note.isPinned ? 'Unpin' : 'Pin',
+                              ),
+                              secondaryBackground: _buildSwipeBackground(
+                                context,
+                                alignment: Alignment.centerRight,
+                                icon: Icons.delete_outline,
+                                color: Colors.red,
+                                label: 'Delete',
+                              ),
+                              child: GestureDetector(
+                                onForcePressStart: Platform.isIOS
+                                    ? (_) {
+                                        _showNotePreview(context, note, vm);
+                                      }
+                                    : null,
+                                onForcePressEnd: Platform.isIOS ? (_) {} : null,
+                                child: Card(
+                                  color: isSelected
+                                      ? Theme.of(context).colorScheme.primaryContainer
+                                      : null,
+                                  elevation: isSelected ? 4 : 1,
+                                  child: ListTile(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
+                                    title: Text(note.title.isEmpty ? 'Untitled' : note.title),
+                                    subtitle: Text(
+                                      note.content.isEmpty ? 'Start writing…' : note.content,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    leading: IconButton(
+                                      tooltip: note.isPinned ? 'Unpin' : 'Pin',
+                                      onPressed: isLoading ? null : () => vm.togglePin(note.id),
+                                      icon: Icon(
+                                        note.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      setState(() => _selectedIndex = index);
+                                      context
+                                          .push('/note-detail', extra: note.id)
+                                          .then((_) => vm.refreshNotes());
+                                    },
+                                    onLongPress: () => _showContextMenu(context, note, vm),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.delete_outline),
+                                      onPressed: isLoading
+                                          ? null
+                                          : () => _confirmDelete(context, vm, note),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-            ),
+                            );
+                          },
+                        ),
+                ),
+              ),
+            );
+          },
+        ),
+        if (isLoading)
+          Container(
+            color: Colors.black26,
+            child: const Center(child: CircularProgressIndicator()),
           ),
-        );
-      },
+      ],
     );
   }
 
@@ -233,11 +285,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _showMoveToFolderDialog(BuildContext context, NoteEntity note, NotesViewModel vm) async {
+  Future<void> _showMoveToFolderDialog(
+    BuildContext context,
+    NoteEntity note,
+    NotesViewModel vm,
+  ) async {
     if (vm.folders.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No folders available. Create a folder first.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No folders available. Create a folder first.')));
       return;
     }
     final String? selectedFolderId = await showDialog<String>(
@@ -246,25 +302,26 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Move to folder'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: vm.folders.map((folder) => ListTile(
-                title: Text(folder.name),
-                onTap: () => Navigator.pop(context, folder.id),
-              )).toList(),
+          children: vm.folders
+              .map(
+                (folder) => ListTile(
+                  title: Text(folder.name),
+                  onTap: () => Navigator.pop(context, folder.id),
+                ),
+              )
+              .toList(),
         ),
         actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
         ],
       ),
     );
     if (selectedFolderId != null) {
       // TODO: Implement move to folder functionality
       // This requires a MoveNoteUseCase to be added
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Move functionality coming soon')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Move functionality coming soon')));
     }
   }
 
@@ -277,10 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Note copied to clipboard'),
-        action: SnackBarAction(
-          label: 'OK',
-          onPressed: () {},
-        ),
+        action: SnackBarAction(label: 'OK', onPressed: () {}),
       ),
     );
   }
@@ -296,15 +350,10 @@ class _HomeScreenState extends State<HomeScreen> {
           title: Text(title),
           content: SizedBox(
             width: double.maxFinite,
-            child: SingleChildScrollView(
-              child: Text(content),
-            ),
+            child: SingleChildScrollView(child: Text(content)),
           ),
           actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Close'),
-            ),
+            TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Close')),
             FilledButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
@@ -328,10 +377,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       alignment: alignment,
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(12)),
       child: Row(
         mainAxisAlignment: (alignment == Alignment.centerLeft)
             ? MainAxisAlignment.start
@@ -341,10 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 8),
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ],
       ),

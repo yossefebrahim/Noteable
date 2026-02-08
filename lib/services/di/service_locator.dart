@@ -1,22 +1,34 @@
 import 'package:get_it/get_it.dart';
 import 'package:noteable_app/core/services/keyboard_shortcut_service.dart';
 import 'package:noteable_app/data/repositories/in_memory_notes_feature_repository.dart';
+import 'package:noteable_app/data/repositories/template_repository_impl.dart';
 import 'package:noteable_app/domain/repositories/notes_feature_repository.dart';
+import 'package:noteable_app/domain/repositories/template_repository.dart';
 import 'package:noteable_app/domain/usecases/feature_usecases.dart';
+import 'package:noteable_app/domain/usecases/template/create_template_usecase.dart';
+import 'package:noteable_app/domain/usecases/template/delete_template_usecase.dart';
+import 'package:noteable_app/domain/usecases/template/get_templates_usecase.dart';
+import 'package:noteable_app/domain/usecases/template/import_export_templates_usecase.dart';
+import 'package:noteable_app/domain/usecases/template/update_template_usecase.dart';
 import 'package:noteable_app/presentation/providers/app_provider.dart';
 import 'package:noteable_app/presentation/providers/keyboard_shortcuts_provider.dart';
+import 'package:noteable_app/presentation/providers/folder_provider.dart';
 import 'package:noteable_app/presentation/providers/note_detail_view_model.dart';
 import 'package:noteable_app/presentation/providers/notes_view_model.dart';
+import 'package:noteable_app/presentation/providers/template_view_model.dart';
+import 'package:noteable_app/services/platform/channels/widget_channel.dart';
+import 'package:noteable_app/services/platform/data_sync_service.dart';
 
 final GetIt sl = GetIt.instance;
 
 Future<void> setupServiceLocator() async {
+  sl.registerLazySingleton<WidgetChannel>(WidgetChannel.new);
+  sl.registerLazySingleton<DataSyncService>(DataSyncService.new);
   sl.registerLazySingleton<AppProvider>(AppProvider.new);
   sl.registerLazySingleton<KeyboardShortcutService>(KeyboardShortcutService.new);
-  sl.registerLazySingleton<KeyboardShortcutsProvider>(
-    () => KeyboardShortcutsProvider(sl()),
-  );
+  sl.registerLazySingleton<KeyboardShortcutsProvider>(() => KeyboardShortcutsProvider(sl()));
   sl.registerLazySingleton<NotesFeatureRepository>(InMemoryNotesFeatureRepository.new);
+  sl.registerLazySingleton<TemplateRepository>(TemplateRepositoryImpl.new);
 
   sl.registerLazySingleton<GetNotesUseCase>(() => GetNotesUseCase(sl()));
   sl.registerLazySingleton<CreateNoteUseCase>(() => CreateNoteUseCase(sl()));
@@ -29,6 +41,24 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<CreateFolderUseCase>(() => CreateFolderUseCase(sl()));
   sl.registerLazySingleton<RenameFolderUseCase>(() => RenameFolderUseCase(sl()));
   sl.registerLazySingleton<DeleteFolderUseCase>(() => DeleteFolderUseCase(sl()));
+
+  sl.registerLazySingleton<GetTemplatesUseCase>(
+    () => GetTemplatesUseCase(templateRepository: sl()),
+  );
+  sl.registerLazySingleton<CreateTemplateUseCase>(
+    () => CreateTemplateUseCase(templateRepository: sl()),
+  );
+  sl.registerLazySingleton<UpdateTemplateUseCase>(
+    () => UpdateTemplateUseCase(templateRepository: sl()),
+  );
+  sl.registerLazySingleton<DeleteTemplateUseCase>(
+    () => DeleteTemplateUseCase(templateRepository: sl()),
+  );
+  sl.registerLazySingleton<ImportExportTemplatesUseCase>(
+    () => ImportExportTemplatesUseCase(templateRepository: sl()),
+  );
+  // Note: ApplyTemplateUseCase is NOT registered as a singleton because it requires
+  // a TemplateEntity parameter at construction time. It's created directly when needed.
 
   sl.registerFactory<NotesViewModel>(
     () => NotesViewModel(
@@ -44,10 +74,12 @@ Future<void> setupServiceLocator() async {
   );
 
   sl.registerFactory<NoteEditorViewModel>(
-    () => NoteEditorViewModel(
-      createNote: sl(),
-      updateNote: sl(),
-      getNotes: sl(),
-    ),
+    () => NoteEditorViewModel(createNote: sl(), updateNote: sl(), getNotes: sl()),
   );
+
+  sl.registerFactory<TemplateViewModel>(() => TemplateViewModel(templateRepository: sl())..load());
+}
+
+Future<void> resetServiceLocator() async {
+  await sl.reset();
 }

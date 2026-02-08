@@ -47,5 +47,24 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>AppGroups</key>
+		<array>
+			<string>group.com.noteable.app</string>
+		</array>
+		<key>FlutterDeepLinkingEnabled</key>
+		<true/>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>com.noteable.app</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>noteable</string>
+				</array>
+			</dict>
+		</array>
 	</dict>
 </plist>
