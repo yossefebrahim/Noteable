@@ -28,17 +28,38 @@ import WidgetKit
     )
 
     widgetChannel.setMethodCallHandler { [weak self] (call, result) in
-      guard call.method == "refreshWidgets" else {
+      switch call.method {
+      case "refreshWidgets":
+        if #available(iOS 14.0, *) {
+          self?.refreshAllWidgets()
+        }
+        result(nil)
+        
+      case "getAppGroupDirectory":
+        guard let args = call.arguments as? [String: Any],
+              let identifier = args["identifier"] as? String else {
+          result(FlutterError(code: "INVALID_ARGUMENTS",
+                            message: "App group identifier is required",
+                            details: nil))
+          return
+        }
+        
+        if let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: identifier) {
+          result(containerURL.path)
+        } else {
+          result(FlutterError(code: "UNAVAILABLE",
+                            message: "App group directory not available",
+                            details: nil))
+        }
+        
+      default:
         result(FlutterMethodNotImplemented)
-        return
       }
-
-      self?.refreshAllWidgets()
-      result(nil)
     }
   }
 
   // Refresh all widget timelines
+  @available(iOS 14.0, *)
   private func refreshAllWidgets() {
     // Reload all widget types
     let widgetKinds = [
@@ -47,7 +68,10 @@ import WidgetKit
       "PinnedNotesWidget"
     ]
 
-    WidgetCenter.shared.reloadTimelines(ofKind: widgetKinds)
+    // Reload each widget kind individually
+    for kind in widgetKinds {
+      WidgetCenter.shared.reloadTimelines(ofKind: kind)
+    }
   }
 
   // Handle incoming deep link when app is opened from a widget tap
@@ -72,13 +96,18 @@ import WidgetKit
   }
 
   private func handleDeepLink(_ url: URL) -> Bool {
-    // Pass the URL to Flutter for routing
-    var navigationController: UINavigationController?
-    navigationController = window?.rootViewController as? UINavigationController
+    // Pass the URL to Flutter for routing via method channel
+    guard let controller = window?.rootViewController as? FlutterViewController else {
+      return false
+    }
 
-    // Let Flutter engine handle the deep link
-    let controller = window?.rootViewController as? FlutterViewController
-    controller?.engine?.launchUrl(url)
+    let deepLinkChannel = FlutterMethodChannel(
+      name: "com.example.noteable/deeplink",
+      binaryMessenger: controller.binaryMessenger
+    )
+
+    // Send the URL to Flutter
+    deepLinkChannel.invokeMethod("handleDeepLink", arguments: url.absoluteString)
 
     return true
   }

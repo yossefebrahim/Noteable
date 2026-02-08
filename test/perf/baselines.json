@@ -1,0 +1,14 @@
+{
+  "app_launch_time_ms": {
+    "target": 2000
+  },
+  "typing_latency_ms": {
+    "target": 500
+  },
+  "search_performance_ms": {
+    "target": 300
+  },
+  "scroll_frame_rate_fps": {
+    "target": 60
+  }
+}

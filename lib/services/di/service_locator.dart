@@ -46,3 +46,7 @@ Future<void> setupServiceLocator() async {
     () => NoteEditorViewModel(createNote: sl(), updateNote: sl(), getNotes: sl()),
   );
 }
+
+Future<void> resetServiceLocator() async {
+  await sl.reset();
+}
