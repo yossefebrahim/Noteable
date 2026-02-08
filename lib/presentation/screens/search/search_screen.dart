@@ -14,6 +14,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<NoteEntity> _results = <NoteEntity>[];
+  bool _isSearching = false;
 
   @override
   void initState() {
@@ -33,27 +34,45 @@ class _SearchScreenState extends State<SearchScreen> {
           children: <Widget>[
             TextField(
               controller: _searchController,
-              decoration: const InputDecoration(prefixIcon: Icon(Icons.search), hintText: 'Search by title or content'),
+              decoration: InputDecoration(
+                prefixIcon: _isSearching
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.search),
+                hintText: 'Search by title or content',
+              ),
               onChanged: (String value) async {
+                setState(() {
+                  _isSearching = true;
+                });
                 _results = await vm.search(value);
-                if (mounted) setState(() {});
+                if (mounted) {
+                  setState(() {
+                    _isSearching = false;
+                  });
+                }
               },
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
-                itemCount: _results.length,
-                itemBuilder: (_, int index) {
-                  final NoteEntity note = _results[index];
-                  return Card(
-                    child: ListTile(
-                      title: Text(note.title.isEmpty ? 'Untitled' : note.title),
-                      subtitle: Text(note.content, maxLines: 2, overflow: TextOverflow.ellipsis),
-                      onTap: () => context.push('/note-detail', extra: note.id),
+              child: _isSearching
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: _results.length,
+                      itemBuilder: (_, int index) {
+                        final NoteEntity note = _results[index];
+                        return Card(
+                          child: ListTile(
+                            title: Text(note.title.isEmpty ? 'Untitled' : note.title),
+                            subtitle: Text(note.content, maxLines: 2, overflow: TextOverflow.ellipsis),
+                            onTap: () => context.push('/note-detail', extra: note.id),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ],
         ),

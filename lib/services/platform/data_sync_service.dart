@@ -27,9 +27,17 @@ class DataSyncService {
 
     try {
       if (Platform.isIOS) {
-        // iOS: Use app group container
-        final appGroupDir = await getApplicationGroupDirectory(identifier: _appGroupIdentifier);
-        _appGroupDirectory = appGroupDir;
+        // iOS: Use app group container via platform channel
+        final String? appGroupPath = await _widgetChannel.invokeMethod<String>(
+          'getAppGroupDirectory',
+          {'identifier': _appGroupIdentifier},
+        );
+
+        if (appGroupPath != null) {
+          _appGroupDirectory = Directory(appGroupPath);
+        } else {
+          throw Exception('Failed to get app group directory path from native side');
+        }
       } else if (Platform.isAndroid) {
         // Android: Use application documents directory
         // Widgets can access this via file provider
@@ -179,10 +187,7 @@ class DataSyncService {
   }
 
   /// Create a new note from widget capture
-  Future<Map<String, dynamic>> createNote({
-    required String title,
-    required String content,
-  }) async {
+  Future<Map<String, dynamic>> createNote({required String title, required String content}) async {
     try {
       final now = DateTime.now();
       final note = <String, dynamic>{

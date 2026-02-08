@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
+import 'package:noteable_app/services/di/service_locator.dart';
 
 import '../../../data/models/note_model.dart';
 import '../data_sync_service.dart';
@@ -143,9 +144,7 @@ class WidgetChannel {
   Future<void> sendNotesToWidget(List<NoteModel> notes) async {
     try {
       final notesJson = notes.map((note) => _noteToJson(note)).toList();
-      await _channel.invokeMethod('updateNotes', <String, dynamic>{
-        'notes': notesJson,
-      });
+      await _channel.invokeMethod('updateNotes', <String, dynamic>{'notes': notesJson});
     } catch (e) {
       debugPrint('Failed to send notes to widget: $e');
     }
