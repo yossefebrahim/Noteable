@@ -84,7 +84,7 @@ class NoteRepositoryImpl implements NoteRepository {
   }
 
   @override
-  Future<String> exportFolder(String? folderId) async {
+  Future<String> exportFolder(String? folderId, String format) async {
     final allNotes = await _isarService.getNotes();
     final filteredNotes = folderId == null
         ? allNotes
@@ -94,24 +94,26 @@ class NoteRepositoryImpl implements NoteRepository {
       throw StateError('No notes found in folder');
     }
 
+    final exportFormat = _parseExportFormat(format);
     final result = await _exportService.exportMultipleNotes(
       filteredNotes,
-      ExportFormat.markdown,
+      exportFormat,
     );
     return result.filePath;
   }
 
   @override
-  Future<String> exportAllNotes() async {
+  Future<String> exportAllNotes(String format) async {
     final allNotes = await _isarService.getNotes();
 
     if (allNotes.isEmpty) {
       throw StateError('No notes to export');
     }
 
+    final exportFormat = _parseExportFormat(format);
     final result = await _exportService.exportMultipleNotes(
       allNotes,
-      ExportFormat.markdown,
+      exportFormat,
     );
     return result.filePath;
   }

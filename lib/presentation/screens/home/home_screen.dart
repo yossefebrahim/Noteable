@@ -115,7 +115,7 @@ class HomeScreen extends StatelessWidget {
     await BulkExportBottomSheet.show(
       context,
       onExportFormatSelected: (ExportFormat format) async {
-        final success = await exportVm.exportAllNotes();
+        final success = await exportVm.exportAllNotes(format.name);
         if (!context.mounted) return;
         _showExportResultSnackBar(context, success, format.name);
       },

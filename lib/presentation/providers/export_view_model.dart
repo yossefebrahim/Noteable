@@ -52,7 +52,7 @@ class ExportViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> exportFolder(String? folderId) async {
+  Future<bool> exportFolder(String? folderId, String format) async {
     _setExportingState(true);
     _clearError();
 
@@ -60,6 +60,7 @@ class ExportViewModel extends ChangeNotifier {
       final useCase = ExportFolderUseCase(
         noteRepository: _noteRepository,
         folderId: folderId,
+        format: format,
       );
 
       final result = await useCase();
@@ -81,13 +82,14 @@ class ExportViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> exportAllNotes() async {
+  Future<bool> exportAllNotes(String format) async {
     _setExportingState(true);
     _clearError();
 
     try {
       final useCase = ExportAllNotesUseCase(
         noteRepository: _noteRepository,
+        format: format,
       );
 
       final result = await useCase();

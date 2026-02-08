@@ -18,9 +18,9 @@ abstract interface class NoteRepository implements BaseRepository {
 
   Future<String> exportNote(String id, String format);
 
-  Future<String> exportFolder(String? folderId);
+  Future<String> exportFolder(String? folderId, String format);
 
-  Future<String> exportAllNotes();
+  Future<String> exportAllNotes(String format);
 
   Future<String> getShareableNoteContent(String id);
 }
