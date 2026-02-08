@@ -1,4 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 import '../models/note_model.dart';
 
@@ -30,6 +35,18 @@ class ExportResult {
   });
 }
 
+/// Internal class to hold export content (text or binary)
+class _ExportContent {
+  final String? text;
+  final Uint8List? bytes;
+
+  _ExportContent.text(this.text) : bytes = null;
+  _ExportContent.binary(this.bytes) : text = null;
+
+  bool get isBinary => bytes != null;
+  bool get isText => text != null;
+}
+
 /// Service for exporting notes to various formats
 class ExportService {
   ExportService();
@@ -41,7 +58,7 @@ class ExportService {
   ) async {
     final content = _convertNote(note, format);
     final fileName = _generateFileName(note.title, format);
-    final filePath = await _saveToFile(fileName, content);
+    final filePath = await _saveToFile(fileName, content, format);
 
     return ExportResult(
       filePath: filePath,
@@ -65,16 +82,16 @@ class ExportService {
   }
 
   /// Convert a note to the specified format
-  String _convertNote(NoteModel note, ExportFormat format) {
+  _ExportContent _convertNote(NoteModel note, ExportFormat format) {
     switch (format) {
       case ExportFormat.markdown:
-        return _convertToMarkdown(note);
+        return _ExportContent.text(_convertToMarkdown(note));
       case ExportFormat.txt:
-        return _convertToTxt(note);
+        return _ExportContent.text(_convertToTxt(note));
       case ExportFormat.pdf:
-        return _convertToPdf(note);
+        return _ExportContent.binary(_convertToPdf(note));
       case ExportFormat.json:
-        return _convertToJson(note);
+        return _ExportContent.text(_convertToJson(note));
     }
   }
 
@@ -123,21 +140,53 @@ class ExportService {
   }
 
   /// Convert note to PDF format
-  String _convertToPdf(NoteModel note) {
-    // PDF export will be fully implemented in subtask-2-5
-    // For now, return the content as text placeholder
-    final buffer = StringBuffer();
+  ///
+  /// Creates a properly formatted PDF document with:
+  /// - Title as large bold heading with bottom margin
+  /// - Content with preserved line breaks
+  /// - Proper page size and margins
+  /// - Readable font (built-in Helvetica)
+  /// - Handles empty title or content gracefully
+  Uint8List _convertToPdf(NoteModel note) {
+    final pdf = pw.Document();
 
-    if (note.title.isNotEmpty) {
-      buffer.writeln(note.title);
-      buffer.writeln();
-    }
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(48),
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              // Title section
+              if (note.title.isNotEmpty) ...[
+                pw.Text(
+                  note.title,
+                  style: pw.TextStyle(
+                    fontSize: 24,
+                    fontWeight: pw.FontWeight.bold,
+                    font: pw.Font.helvetica(),
+                  ),
+                ),
+                pw.SizedBox(height: 24),
+              ],
+              // Content section
+              if (note.content.isNotEmpty)
+                pw.Text(
+                  note.content,
+                  style: pw.TextStyle(
+                    fontSize: 12,
+                    font: pw.Font.helvetica(),
+                    lineHeight: 1.5,
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
 
-    if (note.content.isNotEmpty) {
-      buffer.writeln(note.content);
-    }
-
-    return buffer.toString();
+    return pdf.save();
   }
 
   /// Convert note to JSON format
@@ -207,9 +256,26 @@ class ExportService {
   }
 
   /// Save content to file (placeholder - actual file I/O will be added later)
-  Future<String> _saveToFile(String fileName, String content) async {
+  Future<String> _saveToFile(
+    String fileName,
+    _ExportContent content,
+    ExportFormat format,
+  ) async {
     // File I/O will be implemented when integrating with repository
     // For now, return a placeholder path
+    // The actual implementation will use path_provider and File:
+    //
+    // final directory = await getApplicationDocumentsDirectory();
+    // final file = File('${directory.path}/$fileName');
+    //
+    // if (content.isBinary) {
+    //   await file.writeAsBytes(content.bytes!);
+    // } else {
+    //   await file.writeAsString(content.text!);
+    // }
+    //
+    // return file.path;
+
     return '/path/to/$fileName';
   }
 }
