@@ -683,3 +683,71 @@ Session 2 (Implementation):
   - Status: COMPLETED
 
 === END SESSION 12 ===
+
+=== SESSION 13 ===
+
+[2025-02-08] Subtask-10-1: End-to-end test - Record audio note, save to note, playback
+  - Created test/integration/audio_note_flow_test.dart
+  - Test cases included:
+    1. Complete audio note flow - Creates note, simulates recording, attaches audio, saves, verifies persistence
+    2. Audio attachment removal flow - Tests adding and removing audio attachments
+    3. Multiple audio attachments per note - Tests multiple attachments on a single note
+    4. AudioRecorderProvider state management - Tests recording state, duration, amplitude tracking
+    5. AudioPlayerProvider state management - Tests playback state, position, duration
+    6. Note updates preserve audio attachments - Verifies attachments persist across note edits
+    7. Recording timer accuracy - Tests 5-second recording duration accuracy
+    8. Concurrent note editing with audio attachment - Tests rapid edits and auto-save
+  - The test follows the exact pattern from test/integration/note_flows_integration_test.dart
+  - Verification: flutter test (skipped - Flutter not available in isolated environment)
+  - Status: COMPLETED
+
+[2025-02-08] Subtask-10-2: End-to-end test - Transcribe audio note and search transcription
+  - Created test/integration/audio_transcription_flow_test.dart
+  - Test cases included:
+    1. Complete transcription flow: record audio, transcribe, and search
+    2. Search finds notes by transcription content
+    3. Multiple transcriptions per audio attachment
+    4. Transcription with empty or null text handling
+    5. Transcription persistence across note updates
+    6. Transcription use case error handling
+    7. Partial transcription matches in search
+    8. Case insensitive transcription search
+  - The test follows the exact pattern from existing integration tests
+  - Tests integration between TranscribeAudioUseCase, TranscriptionRepository, AudioRepository, and SearchNotesUseCase
+  - Verification: flutter test (skipped - Flutter not available in isolated environment)
+  - Status: COMPLETED
+
+[2025-02-08] Subtask-10-3: Performance test - Verify large audio files don't cause performance issues
+  - Created test/performance/audio_performance_test.dart
+  - Test cases included:
+    1. Large audio attachment storage performance (10 minute recording)
+       - Verifies storing large audio completes in <2 seconds
+       - Verifies saving note with large audio completes in <3 seconds
+       - Verifies loading note with large audio completes in <1 second
+    2. Multiple large audio attachments performance
+       - Tests adding 5 large attachments efficiently
+       - Verifies save and load performance with multiple attachments
+    3. Audio player provider with large file state management
+       - Verifies provider remains responsive with large audio files
+       - Tests state updates don't block with simulated large files
+    4. Audio recorder provider with long recording duration
+       - Tests recorder provider remains responsive during long recordings
+       - Simulates 60-second recording to verify performance
+       - Verifies duration tracking accuracy
+    5. Database query performance with many large audio attachments
+       - Creates 20 notes with large audio attachments
+       - Tests query performance for all and filtered queries
+    6. Search performance with transcriptions from long audio
+       - Creates transcription from simulated 30-minute recording
+       - Tests search performance with long transcriptions
+    7. Memory efficiency with large audio attachments
+       - Verifies memory doesn't grow unbounded with large files
+       - Tests with 10 large audio attachments
+  - The test follows existing integration test patterns
+  - Tests integration between all audio-related services and providers
+  - Manual verification required - test with actual 10+ minute audio recordings on device
+  - Commit: 823e693 "auto-claude: subtask-10-3 - Performance test: Verify large audio files don't cause performance issues"
+  - Verification: Manual - Test with 10+ minute audio recordings, verify app remains responsive
+  - Status: COMPLETED
+
+=== END SESSION 13 ===
