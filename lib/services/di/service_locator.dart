@@ -1,8 +1,14 @@
 import 'package:get_it/get_it.dart';
 import 'package:noteable_app/data/repositories/in_memory_notes_feature_repository.dart';
+import 'package:noteable_app/data/repositories/note_repository_impl.dart';
 import 'package:noteable_app/data/services/export_service.dart';
+import 'package:noteable_app/domain/repositories/note_repository.dart';
 import 'package:noteable_app/domain/repositories/notes_feature_repository.dart';
 import 'package:noteable_app/domain/usecases/feature_usecases.dart';
+import 'package:noteable_app/domain/usecases/export/export_note_usecase.dart';
+import 'package:noteable_app/domain/usecases/export/export_folder_usecase.dart';
+import 'package:noteable_app/domain/usecases/export/export_all_notes_usecase.dart';
+import 'package:noteable_app/domain/usecases/export/share_note_usecase.dart';
 import 'package:noteable_app/presentation/providers/app_provider.dart';
 import 'package:noteable_app/presentation/providers/note_detail_view_model.dart';
 import 'package:noteable_app/presentation/providers/notes_view_model.dart';
@@ -25,6 +31,20 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<CreateFolderUseCase>(() => CreateFolderUseCase(sl()));
   sl.registerLazySingleton<RenameFolderUseCase>(() => RenameFolderUseCase(sl()));
   sl.registerLazySingleton<DeleteFolderUseCase>(() => DeleteFolderUseCase(sl()));
+
+  // Export use cases
+  // Note: ExportNoteUseCase, ExportFolderUseCase, and ShareNoteUseCase require
+  // runtime parameters (noteId, folderId, format) and are instantiated directly
+  // where needed with those parameters.
+  //
+  // Example usage:
+  // final exportUseCase = ExportNoteUseCase(
+  //   noteRepository: sl<NoteRepository>(),
+  //   noteId: 'note-123',
+  //   format: 'markdown',
+  // );
+  //
+  // These use cases are imported and available for use throughout the app.
 
   sl.registerFactory<NotesViewModel>(
     () => NotesViewModel(
