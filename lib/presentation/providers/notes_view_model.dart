@@ -33,18 +33,26 @@ class NotesViewModel extends ChangeNotifier {
 
   List<NoteEntity> _notes = <NoteEntity>[];
   List<FolderEntity> _folders = <FolderEntity>[];
+  bool _isLoading = false;
 
   List<NoteEntity> get notes => _notes;
   List<FolderEntity> get folders => _folders;
+  bool get isLoading => _isLoading;
 
   Future<void> load() async {
+    _isLoading = true;
+    notifyListeners();
     _notes = await _getNotes();
     _folders = await _getFolders();
+    _isLoading = false;
     notifyListeners();
   }
 
   Future<void> refreshNotes() async {
+    _isLoading = true;
+    notifyListeners();
     _notes = await _getNotes();
+    _isLoading = false;
     notifyListeners();
   }
 
@@ -60,19 +68,27 @@ class NotesViewModel extends ChangeNotifier {
 
   Future<void> createFolder(String name) async {
     if (name.trim().isEmpty) return;
+    _isLoading = true;
+    notifyListeners();
     await _createFolder(name.trim());
     _folders = await _getFolders();
+    _isLoading = false;
     notifyListeners();
   }
 
   Future<void> renameFolder(String id, String name) async {
     if (name.trim().isEmpty) return;
+    _isLoading = true;
+    notifyListeners();
     await _renameFolder(id, name.trim());
     _folders = await _getFolders();
+    _isLoading = false;
     notifyListeners();
   }
 
   Future<void> deleteFolder(String id) async {
+    _isLoading = true;
+    notifyListeners();
     await _deleteFolder(id);
     _folders = await _getFolders();
     await refreshNotes();
