@@ -3,23 +3,23 @@
   "spec": "003-voice-notes-audio-recording",
   "state": "building",
   "subtasks": {
-    "completed": 25,
+    "completed": 32,
     "total": 45,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "State Management - Audio Providers",
+    "current": "Screens - Audio Recording Screen",
     "id": null,
-    "total": 5
+    "total": 3
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 31,
+    "number": 38,
     "started_at": "2026-02-08T00:31:10.237502"
   },
-  "last_update": "2026-02-08T02:12:27.138799"
+  "last_update": "2026-02-08T02:36:21.498514"
 }
