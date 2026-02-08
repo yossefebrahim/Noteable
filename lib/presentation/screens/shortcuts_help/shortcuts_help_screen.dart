@@ -211,7 +211,7 @@ class _ShortcutKey extends StatelessWidget {
           .map(
             (part) => Padding(
               padding: const EdgeInsets.only(left: 4),
-              child: _KeyCap(key: part),
+              child: _KeyCap(keyLabel: part),
             ),
           )
           .toList(),
@@ -221,9 +221,9 @@ class _ShortcutKey extends StatelessWidget {
 
 /// Individual key cap widget for displaying a key.
 class _KeyCap extends StatelessWidget {
-  final String key;
+  final String keyLabel;
 
-  const _KeyCap({required this.key});
+  const _KeyCap({required this.keyLabel});
 
   @override
   Widget build(BuildContext context) {
@@ -237,7 +237,7 @@ class _KeyCap extends StatelessWidget {
         ),
       ),
       child: Text(
-        key,
+        keyLabel,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
